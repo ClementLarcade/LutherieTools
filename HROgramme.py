@@ -45,10 +45,10 @@ def HROgramme(signal: np.ndarray,
         
         
     for (i,j), x in np.ndenumerate(matFk):
-        # Supprimer les frequences calculées au delà de samplerate
+        # Supprimer les frequences calculées au delà de F nyquist
         if x > 0.5*samplerate:
             
-            x = np.NaN
+            matFk[i,j] = np.NaN
             matBk[i,j] = np.NaN
             matJk[i,j] = np.NaN
         

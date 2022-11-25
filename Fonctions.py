@@ -30,7 +30,9 @@ def memoize(func):
     return wrapper 
 
 
-def exportJson(mat: np.ndarray, file_path: str) -> None:
+def exportJson(mat: np.ndarray,
+               file_path: str
+               ) -> None:
     """
     Pour exporter les matrices résultats sous forme de fichier .json
 
@@ -61,7 +63,9 @@ def decimation(signal: np.ndarray,
     return signal, newSamplerate
 
 
-def seuil(inputArray: np.ndarray, seuil: float) -> np.ndarray:
+def seuil(inputArray: np.ndarray,
+          seuil: float
+          ) -> np.ndarray:
     
     array = np.zeros_like(inputArray)    
     
@@ -104,10 +108,15 @@ def esterBd(signal, nbPolesMax):
     return J
 
 
+def stabilité(signal: np.ndarray, matBk:np.ndarray, nbPoles: int):
+    
+    return
+    
+
 @memoize #utiliser pour accélerer l'algorithme ESPRIT en réutilisant les valeurs déja calculées
-def espritBd(signal: np.ndarray,
-             nbPoles: int
-             ) -> tuple[np.ndarray, np.ndarray]:
+def ESPRIT(signal: np.ndarray,
+           nbPoles: int
+           ) -> tuple[np.ndarray, np.ndarray]:
     """
     Appel de l'algorithme ESPRIT pour la détermination des paramêtres du signal
     Appelle également l'algorithme d'estimation ESTER pour déterminer l'ordre du modèle
@@ -120,52 +129,53 @@ def espritBd(signal: np.ndarray,
         np.ndarray, np.ndarray: les matrices Z (ESPRIT) et J (ESTER)
     """    
     # contient également l'implémentation du critère ESTER 
-        
-    signal = signal[:]
+    
     N = signal.shape[0]
 
-    H = int(N/3)
+    M = int(N/3)
+    l = N - M + 1 # M vaut N /3 et l vaut horizon - M + 1
 
-    X = hankel(signal[0 : H], signal[H : -1])
-    H = X @ np.transpose(X) 
+    H = hankel(signal[0 : M], signal[l : -1])
+    C =  1/l * H @ H.T
   
-
-    U, _V, _L = np.linalg.svd(H, full_matrices=False)
+    W, _V, _L = np.linalg.svd(C, full_matrices=False)
     del _V, _L
     
-    U = U[:, 0:nbPoles]
-    Uup = U[1:-1, :]
-    Udown = U[0:-2, :]
+    W = W[:, 0: nbPoles]
+    Wup = W[1: -1, :]
+    Wdown = W[0: -2, :]
     
-    phi = np.linalg.pinv(Udown) @ Uup
+    RK = np.linalg.pinv(Wdown) @ Wup
 
-    Z = np.linalg.eig(phi)[0]
+    Z = np.linalg.eig(RK)[0]
     
     
     # Calcul du critère ESTER
     
-    nbPolesMax = nbPoles//2
+    nbPolesMax = int(nbPoles/2)
     
     J = np.zeros(nbPolesMax)
     
     for pole in range(1, nbPolesMax + 1):
         
-        Us = U[:, 0: pole]
-        Uup = Us[1: -1, :]
-        Udown = Us[0: -2, :]
-        phi = np.linalg.pinv(Udown) @ Uup
-        E = Uup - Udown @ phi
+        Ws = W[:, 0: pole]
+        Wup = Ws[1: -1, :]
+        Wdown = Ws[0: -2, :]
+        RK = np.linalg.pinv(Wdown) @ Wup
+        E = Wup - Wdown @ RK
         J[pole - 1] = 1/np.linalg.norm(E, 2)
     
     return Z, J
 
     
-def moindreCarres(Z: np.ndarray, S: np.ndarray) -> np.ndarray:
+def moindreCarres(vecPoles: np.ndarray,
+                  signal: np.ndarray
+                  ) -> np.ndarray:
     
-    V = np.transpose(np.vander(Z, S.size))
-    B = np.linalg.pinv(V) @ S
+    Ve = np.transpose(np.vander(vecPoles, signal.size))
+    b = np.linalg.pinv(Ve) @ signal
     
-    return B
+    return b
 
 
 def parametres(signal: np.ndarray, 
@@ -182,12 +192,13 @@ def parametres(signal: np.ndarray,
     Returns:
         tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]: _description_
     """    
-    signal_z, J= espritBd(signal, 2*nbPoles)
+   
+    signal_z, J= ESPRIT(signal, 2*nbPoles)
     
     # régler le pb de dimension de signal_Z dans np.linalg.eig()
     
-    f = np.angle(signal_z)*samplerate/(2*np.pi)
-    ksi = -np.log10(abs(signal_z))*samplerate
+    f = np.angle(signal_z) * samplerate/(2*np.pi)
+    ksi = -np.log(abs(signal_z))*samplerate
     b = moindreCarres(signal_z, signal)    
     
     f = f[f > 0]

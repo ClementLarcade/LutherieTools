@@ -18,7 +18,7 @@ timeDebut = perf_counter()
 
 
 
-preset = "sample"     # "gen","sample" ou "json" ou "jsonConsole"
+preset = "gen"     # "gen","sample" ou "json" ou "jsonConsole"
 paramsPath = ''
 
 # forme d'appel : python mainHROgramme.py args.json jsonConsole
@@ -47,9 +47,6 @@ matFk, matKsik, matBk, matJk = HROgramme(signal,
 
 T = repmat(np.linspace(0, signalLength, matFk.shape[1]), nbPoles, 1)
 
-# seuillage des Bk
-matBkSeuil = Fonctions.seuil(matBk, 10E-5)
-matBkSeuil = matBkSeuil/np.nanmax(matBkSeuil)
 
 
 #%% Export en json des matrices 
@@ -73,6 +70,11 @@ print(f"temps d'execution = {timeTotal}")
 
 #%% affichage
 
+
+# seuillage des Bk
+matBkSeuil = Fonctions.seuil(matBk, 10E-0)
+matBkSeuil = matBkSeuil/np.nanmax(matBkSeuil)
+
 plt.close('all')
 ylim = (0,3000)
 
@@ -80,7 +82,7 @@ ylim = (0,3000)
 fig, ax1 = plt.subplots(1,2, figsize = (12,6))
 
 ax = ax1[0]
-ax.scatter(T[:], matFk[:], s = 15, c = 1 - matBkSeuil[:])
+ax.scatter(T[:], matFk[:], s = 15, c = matBkSeuil[:], cmap='Greys')
 ax.set_xlim((0, signal.size/samplerate))
 ax.set_ylim(ylim[0], ylim[1])
 ax.set_title("les Bk")
@@ -97,7 +99,7 @@ fig2, ax2 = plt.subplots()
 
 ax2.plot(t, signal)
 ax2.set_xlim((0, signal.size/samplerate))
-ax2.set_title("Le signal")
+ax2.set_title("Signal")
 plt.tight_layout()
 
 

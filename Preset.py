@@ -34,13 +34,13 @@ def Preset(preset: str,
 
     if preset == "gen":
         
-        samplerate = 44100
+        samplerate = 22050
         duree = 1
-        t, signal = signauxTest(duree, samplerate, "battements")
+        t, signal = signauxTest(duree, samplerate, "sinusAleatoires")
             
-        horizon = 0.01
-        overlap = 0.25
-        nbPoles = 50
+        horizon = 0.005
+        overlap = 0.75
+        nbPoles = 100
 
         
     elif preset == "sample":
