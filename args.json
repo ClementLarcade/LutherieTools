@@ -1,11 +1,7 @@
 {
     "filepath": "Clips audio/Violon.wav",
-    "horizon" : 0.02,
-    "overlap" : 0.15,
-    "nbPoles" : 100,
-    "samplerate" : 44100,
-    
-    "matFkPath" : "./Fk.json",
-    "matBkPath" : "./Bk.json",
-    "matJkPath" : "./Jk.json"
+    "horizon" : 0.01,
+    "overlap" : 0.25,
+    "nbPoles" : 25,
+    "samplerate" : 44100
 }

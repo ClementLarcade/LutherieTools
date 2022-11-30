@@ -25,9 +25,9 @@ paramsPath = ''
 
 if len(argv) > 1:
     paramsPath = argv[1]
-    preset = argv[2]
+    preset = "json"
     
-signal, samplerate, horizon, overlap, nbPoles, exportFolder = Preset(preset, paramsPath)
+(signal, samplerate, horizon, overlap, nbPoles, exportFolder) = Preset(preset, paramsPath)
 signal = np.array(signal)
 
 # Process
@@ -72,17 +72,18 @@ print(f"temps d'execution = {timeTotal}")
 
 
 # seuillage des Bk
-matBkSeuil = Fonctions.seuil(matBk, 10E-0)
-matBkSeuil = matBkSeuil/np.nanmax(matBkSeuil)
+
+matBk = matBk/np.nanmax(matBk)
+matBkSeuil = Fonctions.seuil(matBk, 10E-4)
 
 plt.close('all')
-ylim = (0,3000)
+ylim = (0, 3000)
 
 
-fig, ax1 = plt.subplots(1,2, figsize = (12,6))
+fig, ax1 = plt.subplots(1, 2, figsize = (12, 6))
 
 ax = ax1[0]
-ax.scatter(T[:], matFk[:], s = 15, c = matBkSeuil[:], cmap='Greys')
+ax.scatter(T[:], matFk[:], s = 15, c = 1 - matBkSeuil[:])
 ax.set_xlim((0, signal.size/samplerate))
 ax.set_ylim(ylim[0], ylim[1])
 ax.set_title("les Bk")

@@ -14,11 +14,10 @@ def Preset(preset: str,
     Fonction déterminant quel signal et paramètres on utilisera : 
     - "gen" : signal généré
     - "sample" : un fichier déterminé par son chemin
-    - "json" : le chemin du fichier et les paramètres sont stockés dans un fichier .json
-    - "jsonConsole" : comme "json" mais utilisé pour appeler le programme depuis le terminal du serveur 
+    - "json" : comme "json" mais utilisé pour appeler le programme depuis le terminal du serveur 
 
     Args:
-        preset (str): "gen", "sample", "json", "jsonConsole"
+        preset (str): "gen", "sample", "json"
         paramsPath (str): le chemin vers le fichier .json contenant les paramètres 
 
     Returns:
@@ -67,41 +66,10 @@ def Preset(preset: str,
         overlap = 0.25
         nbPoles = 50
         
-
-    elif preset == "json": 
-        """
-        on a reussi à mettre les paramètres et le chemin du son dans un fichier JSON
-        pour simuler l'envoie depuis l'appli vers le serveur
         
-        """
+    elif preset == 'json': 
         
-        arguments = open("arguments.json")
-        argsDict = json.load(arguments)
-        
-        [samplerate, signal] = read(argsDict["filepath"])
-        
-        if signal.shape[0] > 1:
-            signal = signal[:,0]
-        
-        
-        horizon = argsDict["horizon"]
-        overlap = argsDict["overlap"]
-        nbPoles = argsDict["nbPoles"]
-
-        
-        # Preparation 
-        
-        newSamplerate = samplerate / 2
-            
-        signal, samplerate = Fonctions.decimation(signal, samplerate, newSamplerate)
-        
-        
-    elif preset == 'jsonConsole':
-        
-        jsonPath = paramsPath    
-        
-        arguments = open(jsonPath)
-        argsDict = json.load(arguments)
+        argsDict = json.load(open(paramsPath))
         
         [samplerate, signal] = read(argsDict["filepath"])
         
@@ -122,7 +90,7 @@ def Preset(preset: str,
         signal, samplerate = Fonctions.decimation(signal, samplerate, newSamplerate)
 
     
-    exportFolder = "export_"+str(int(time()))
+    exportFolder = "export_" + str(int(time()))
         
     return signal, samplerate, horizon, overlap, nbPoles, exportFolder
 
