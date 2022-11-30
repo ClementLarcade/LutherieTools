@@ -16,7 +16,7 @@ timeDebut = perf_counter()
 # tester les signaux tests
 # trouver des plages de variations pour les params d'étude
 
-
+# commentaire pour tester github
 
 preset = "gen"     # "gen","sample" ou "json" ou "jsonConsole"
 paramsPath = ''
