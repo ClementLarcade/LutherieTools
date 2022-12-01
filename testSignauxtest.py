@@ -8,7 +8,7 @@ NFFT = 8192
 
 t, signal = signauxTest(duree= 0.5,
                         samplerate=samplerate,
-                        presetSignal="sinusAleatoires")
+                        presetSignal="guitareSimulee")
 
 
 fig, (ax1, ax2) = plt.subplots(2,1)

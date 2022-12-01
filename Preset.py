@@ -8,7 +8,8 @@ import numpy as np
 
 
 def Preset(preset: str,
-           paramsPath: str
+           paramsPath: str,
+           signalPreset = "diapason"
            ) -> tuple[np.ndarray, float, float, float, int, str ]:
     """
     Fonction déterminant quel signal et paramètres on utilisera : 
@@ -18,6 +19,7 @@ def Preset(preset: str,
 
     Args:
         preset (str): "gen", "sample", "json"
+        signalPreset (str): preset pour le signal à générer
         paramsPath (str): le chemin vers le fichier .json contenant les paramètres 
 
     Returns:
@@ -33,18 +35,18 @@ def Preset(preset: str,
 
     if preset == "gen":
         
-        samplerate = 22050
+        samplerate = 44100
         duree = 1
-        t, signal = signauxTest(duree, samplerate, "sinusAleatoires")
+        t, signal = signauxTest(duree, samplerate, signalPreset)
             
-        horizon = 0.005
-        overlap = 0.75
-        nbPoles = 100
+        horizon = 0.02
+        overlap = 0.15
+        nbPoles = 50
 
         
     elif preset == "sample":
         
-        [samplerate, signal] = read("Clips audio/Violon.wav")
+        [samplerate, signal] = read("Clips audio/Kremona.wav")
         
         if signal.ndim > 1:
             # on isole le premier canal
@@ -59,11 +61,11 @@ def Preset(preset: str,
         
         # on remarque que pour une samplerate < 15000 Hz l'algo affiche n'importe quoi
         
-        signal, samplerate = Fonctions.decimation(signal, samplerate, newSamplerate)
+        #signal, samplerate = Fonctions.decimation(signal, samplerate, newSamplerate)
         
         
-        horizon = 0.01
-        overlap = 0.25
+        horizon = 0.05
+        overlap = 0.15
         nbPoles = 50
         
         

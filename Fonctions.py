@@ -78,7 +78,9 @@ def seuil(inputArray: np.ndarray,
     return array
 
 
-def esterBd(signal, nbPolesMax):
+def esterBd(signal: np.ndarray,
+            nbPolesMax: int
+            ) -> np.ndarray:
     
     # calcul du parametre ESTER : plus utilisé car intégré dans espritBd pour
     # pas recalculer la svd longue et gagner en temps de calcul
@@ -108,7 +110,10 @@ def esterBd(signal, nbPolesMax):
     return J
 
 
-def stabilité(signal: np.ndarray, matBk:np.ndarray, nbPoles: int):
+def stabilité(signal: np.ndarray, 
+              matBk:np.ndarray,
+              nbPoles: int
+              ):
     
     return
     

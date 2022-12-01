@@ -83,7 +83,7 @@ def signauxTest(duree: float,
 
     # Simple diapasion
     if presetSignal == "diapason":
-        signal = np.sin(2*np.pi*fondamental*t)
+        signal = np.sin(2*np.pi*diapason*t)
         return t, signal
     
     

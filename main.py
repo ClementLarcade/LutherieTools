@@ -16,18 +16,25 @@ timeDebut = perf_counter()
 # tester les signaux tests
 # trouver des plages de variations pour les params d'étude
 
-# commentaire pour tester github
 
-preset = "gen"     # "gen","sample" ou "json" ou "jsonConsole"
+preset = "gen"     # "gen","sample" ou "json" 
+signalPreset = "diapason"
+# Envelope, battements, sinusAleatoires, diapason, dordeIdeale
+# guitareSimulee, guitareCorps, guitareModesDoubles, guitareBruit
+
 paramsPath = ''
 
-# forme d'appel : python mainHROgramme.py args.json jsonConsole
+# forme d'appel : python mainHROgramme.py args.json 
 
 if len(argv) > 1:
     paramsPath = argv[1]
     preset = "json"
     
-(signal, samplerate, horizon, overlap, nbPoles, exportFolder) = Preset(preset, paramsPath)
+(signal, samplerate, horizon, 
+ overlap, nbPoles, exportFolder) = Preset(preset, 
+                                          paramsPath,
+                                          signalPreset=signalPreset
+                                          )
 signal = np.array(signal)
 
 # Process
@@ -43,7 +50,8 @@ matFk, matKsik, matBk, matJk = HROgramme(signal,
                                          samplerate,
                                          horizon,
                                          overlap,
-                                         nbPoles)
+                                         nbPoles
+                                         )
 
 T = repmat(np.linspace(0, signalLength, matFk.shape[1]), nbPoles, 1)
 
@@ -73,26 +81,37 @@ print(f"temps d'execution = {timeTotal}")
 
 # seuillage des Bk
 
-matBk = matBk/np.nanmax(matBk)
-matBkSeuil = Fonctions.seuil(matBk, 10E-4)
+#matBk = matBk/np.nanmax(matBk)
+
+matBkdB = 20*np.log10(matBk)
+matBkSeuil = Fonctions.seuil(matBkdB, -30)
+
 
 plt.close('all')
-ylim = (0, 3000)
+ylim = (0, 1500)
 
 
 fig, ax1 = plt.subplots(1, 2, figsize = (12, 6))
 
 ax = ax1[0]
-ax.scatter(T[:], matFk[:], s = 15, c = 1 - matBkSeuil[:])
+plot = ax.scatter(T[:], 
+                  matFk[:],
+                  s = 5,
+                  c = matBkSeuil[:]
+                  )
 ax.set_xlim((0, signal.size/samplerate))
 ax.set_ylim(ylim[0], ylim[1])
-ax.set_title("les Bk")
+ax.set_title("HROGramme")
+fig.colorbar(plot, ax=ax)
+
 
 ax = ax1[1]
-ax.specgram(list(signal), 8192, samplerate)
+spectrogramme = ax.specgram(list(signal), 8192, samplerate)
 ax.set_xlim((0, signal.size/samplerate))
 ax.set_ylim(ylim[0], ylim[1])
-             
+plt.colorbar(spectrogramme[3])
+
+            
 t = np.linspace(0, signal.size/samplerate, signal.size)
 
 
