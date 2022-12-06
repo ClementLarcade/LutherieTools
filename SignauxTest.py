@@ -67,7 +67,7 @@ def signauxTest(duree: float,
         return t, signal 
         
     
-    diapason = 440
+    diapason = 600
     fondamental = diapason * 0.5
     
     FList = [fondamental,
@@ -119,7 +119,7 @@ def signauxTest(duree: float,
 
 
     # Ajout du bruit
-    bruit = np.random.randn(signal.size) * 0.5
+    bruit = np.random.randn(signal.size) * 0.1
     signal += bruit
     
     if presetSignal == "guitareBruit":

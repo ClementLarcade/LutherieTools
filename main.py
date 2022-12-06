@@ -12,14 +12,16 @@ from Preset import Preset
 
 timeDebut = perf_counter()
 
+
 # Seuiller matKsik et matJk
 # tester les signaux tests
 # trouver des plages de variations pour les params d'étude
 
 
-preset = "gen"     # "gen","sample" ou "json" 
-signalPreset = "diapason"
-# Envelope, battements, sinusAleatoires, diapason, dordeIdeale
+preset = "gen"     
+# "gen","sample" ou "json" 
+signalPreset = "cordeIdeale"
+# Envelope, battements, sinusAleatoires, diapason, cordeIdeale
 # guitareSimulee, guitareCorps, guitareModesDoubles, guitareBruit
 
 paramsPath = ''
@@ -84,46 +86,63 @@ print(f"temps d'execution = {timeTotal}")
 #matBk = matBk/np.nanmax(matBk)
 
 matBkdB = 20*np.log10(matBk)
-matBkSeuil = Fonctions.seuil(matBkdB, -30)
+matBkSeuil = Fonctions.seuil(matBkdB, -60)
 
 
 plt.close('all')
-ylim = (0, 1500)
+ylim = (0, 1600)
 
 
-fig, ax1 = plt.subplots(1, 2, figsize = (12, 6))
+if preset == "gen": plotTitle = signalPreset
 
-ax = ax1[0]
+else: plotTitle = "HROGramme"
+
+
+
+###############################################
+fig, ax1 = plt.subplots(figsize = (6, 8))
+
+ax = ax1
+#ax.set_facecolor("#440154")
 plot = ax.scatter(T[:], 
                   matFk[:],
                   s = 5,
-                  c = matBkSeuil[:]
+                  c = matBkSeuil[:],
+                  cmap = "Reds"
                   )
 ax.set_xlim((0, signal.size/samplerate))
 ax.set_ylim(ylim[0], ylim[1])
-ax.set_title("HROGramme")
-fig.colorbar(plot, ax=ax)
+ax.set_title(plotTitle, fontsize = "13")
+ax.set_xlabel("Temps (s)", fontsize = "13")
+ax.set_ylabel("Fréquence (Hz)", fontsize = "13")
+fig.colorbar(plot, ax=ax, label = "Amplitude (dB)")
+
+fig.savefig(f"{signalPreset}.png", dpi = 1000)
 
 
+
+"""
 ax = ax1[1]
 spectrogramme = ax.specgram(list(signal), 8192, samplerate)
 ax.set_xlim((0, signal.size/samplerate))
 ax.set_ylim(ylim[0], ylim[1])
 plt.colorbar(spectrogramme[3])
-
+################################################
             
-t = np.linspace(0, signal.size/samplerate, signal.size)
 
 
+
+################################################
 fig2, ax2 = plt.subplots()
 
+t = np.linspace(0, signal.size/samplerate, signal.size)
 ax2.plot(t, signal)
 ax2.set_xlim((0, signal.size/samplerate))
 ax2.set_title("Signal")
 plt.tight_layout()
+###############################################
 
 
-"""
 fig3, ax3 = plt.subplots()
 
 ax3.scatter(T[:], matFk[:], s = 15, c = 1 - matKsik[:])

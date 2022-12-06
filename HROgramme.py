@@ -1,5 +1,8 @@
 import numpy as np
 import Fonctions
+import matplotlib.pyplot as plt
+from copy import deepcopy
+
 
 def HROgramme(signal: np.ndarray,
               samplerate: float,
@@ -37,7 +40,7 @@ def HROgramme(signal: np.ndarray,
         if curseur + echParHorizon >= signalLength:
             break
         
-        fenetre = signal[curseur : curseur + echParHorizon]
+        fenetre = deepcopy(signal[curseur : curseur + echParHorizon])
         
         matFk[:, k], matKsik[:, k], matBk[:, k], matJk[:, k] = Fonctions.parametres(fenetre, samplerate, nbPoles)
         

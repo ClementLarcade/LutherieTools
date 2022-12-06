@@ -36,21 +36,23 @@ def Preset(preset: str,
     if preset == "gen":
         
         samplerate = 44100
-        duree = 1
+        duree = 0.5
         t, signal = signauxTest(duree, samplerate, signalPreset)
             
-        horizon = 0.02
+        horizon = 0.05
         overlap = 0.15
-        nbPoles = 50
+        nbPoles = 10
 
         
     elif preset == "sample":
         
-        [samplerate, signal] = read("Clips audio/Kremona.wav")
+        [samplerate, signal] = read("Clips audio/Clip_basse2.wav")
         
         if signal.ndim > 1:
             # on isole le premier canal
             signal = signal[:, 0]
+            
+        signal = np.array(signal, dtype = "float")
             
         duree = signal.size/samplerate
         print(f'duree du signal = {duree}')
@@ -64,9 +66,9 @@ def Preset(preset: str,
         #signal, samplerate = Fonctions.decimation(signal, samplerate, newSamplerate)
         
         
-        horizon = 0.05
+        horizon = 0.02
         overlap = 0.15
-        nbPoles = 50
+        nbPoles = 5
         
         
     elif preset == 'json': 
@@ -93,6 +95,8 @@ def Preset(preset: str,
 
     
     exportFolder = "export_" + str(int(time()))
+    
+    signal = signal/np.max(signal)
         
     return signal, samplerate, horizon, overlap, nbPoles, exportFolder
 

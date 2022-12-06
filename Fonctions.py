@@ -1,9 +1,10 @@
 import numpy as np
-from scipy.linalg import hankel
+from scipy.linalg import hankel, svd
 from scipy.signal import decimate
 import json
 from codecs import open
 from functools import wraps
+import matplotlib.pyplot as plt
 
 """"
 Ester : calculer la matrice U depuis ESPRIT
@@ -93,6 +94,7 @@ def esterBd(signal: np.ndarray,
     H = X @ np.transpose(X)     # @ c'est le produit matriciel
     
     U, _V, _L = np.linalg.svd(H)    
+    # essayer avec la SVD de scipy (sans doute plus rapide)
     del _V, _L
     
     J = np.zeros(nbPolesMax)
@@ -138,10 +140,10 @@ def ESPRIT(signal: np.ndarray,
     N = signal.shape[0]
 
     M = int(N/3)
-    l = N - M + 1 # M vaut N /3 et l vaut horizon - M + 1
+    L = N - M + 1 # M vaut N /3 et l vaut horizon - M + 1
 
-    H = hankel(signal[0 : M], signal[l : -1])
-    C =  1/l * H @ H.T
+    H = hankel(signal[0 : M], signal[L : -1])
+    C =  1/L * H @ H.T
   
     W, _V, _L = np.linalg.svd(C, full_matrices=False)
     del _V, _L
@@ -198,6 +200,9 @@ def parametres(signal: np.ndarray,
         tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]: _description_
     """    
    
+    Hamm = np.hamming(signal.size)
+    signal *= Hamm
+    
     signal_z, J= ESPRIT(signal, 2*nbPoles)
     
     # régler le pb de dimension de signal_Z dans np.linalg.eig()
@@ -208,10 +213,11 @@ def parametres(signal: np.ndarray,
     
     f = f[f > 0]
     ksi = ksi[ksi > 0]
-    b = np.abs(b[np.imag(b) > 0])
+    b = np.abs(b[np.imag(b) > 0])  
     
     f = np.resize(f, (nbPoles))
-    ksi = np.resize(ksi, (nbPoles))
+    ksi = np.resize(ksi, (nbPoles)) 
+    #pb de dimension des ksik
     b = np.resize(b, (nbPoles))
     
     
