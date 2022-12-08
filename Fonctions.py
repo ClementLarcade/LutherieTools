@@ -152,9 +152,9 @@ def ESPRIT(signal: np.ndarray,
     Wup = W[1: -1, :]
     Wdown = W[0: -2, :]
     
-    RK = np.linalg.pinv(Wdown) @ Wup
+    Rk = np.linalg.pinv(Wdown) @ Wup
 
-    Z = np.linalg.eig(RK)[0]
+    Z = np.linalg.eig(Rk)[0]
     
     
     # Calcul du critère ESTER
@@ -168,8 +168,8 @@ def ESPRIT(signal: np.ndarray,
         Ws = W[:, 0: pole]
         Wup = Ws[1: -1, :]
         Wdown = Ws[0: -2, :]
-        RK = np.linalg.pinv(Wdown) @ Wup
-        E = Wup - Wdown @ RK
+        Rk = np.linalg.pinv(Wdown) @ Wup
+        E = Wup - Wdown @ Rk
         J[pole - 1] = 1/np.linalg.norm(E, 2)
     
     return Z, J

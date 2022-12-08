@@ -9,6 +9,7 @@ from time import perf_counter
 from HROgramme import HROgramme
 import Fonctions
 from Preset import Preset
+from Affichage import affichage
 
 timeDebut = perf_counter()
 
@@ -20,7 +21,7 @@ timeDebut = perf_counter()
 
 preset = "gen"     
 # "gen","sample" ou "json" 
-signalPreset = "cordeIdeale"
+signalPreset = "diapason"
 # Envelope, battements, sinusAleatoires, diapason, cordeIdeale
 # guitareSimulee, guitareCorps, guitareModesDoubles, guitareBruit
 
@@ -97,8 +98,17 @@ if preset == "gen": plotTitle = signalPreset
 
 else: plotTitle = "HROGramme"
 
+affichage(matFk,
+          matBkSeuil,
+          matKsik,
+          matJk,
+          signalPreset=preset
+          )
 
 
+
+
+# Passer tout ca dans son fichier perso
 ###############################################
 fig, ax1 = plt.subplots(figsize = (6, 8))
 
@@ -117,7 +127,7 @@ ax.set_xlabel("Temps (s)", fontsize = "13")
 ax.set_ylabel("Fréquence (Hz)", fontsize = "13")
 fig.colorbar(plot, ax=ax, label = "Amplitude (dB)")
 
-fig.savefig(f"{signalPreset}.png", dpi = 1000)
+# fig.savefig(f"{signalPreset}.png", dpi = 1000)
 
 
 
@@ -157,6 +167,6 @@ ax4.set_xlim((0, signal.size/samplerate))
 ax4.set_ylim(ylim[0], ylim[1])
 """
 
-plt.show()
+
 
 

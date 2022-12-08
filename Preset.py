@@ -36,12 +36,12 @@ def Preset(preset: str,
     if preset == "gen":
         
         samplerate = 44100
-        duree = 0.5
+        duree = 2
         t, signal = signauxTest(duree, samplerate, signalPreset)
             
         horizon = 0.05
         overlap = 0.15
-        nbPoles = 10
+        nbPoles = 2
 
         
     elif preset == "sample":
