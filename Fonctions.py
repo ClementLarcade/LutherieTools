@@ -112,7 +112,7 @@ def esterBd(signal: np.ndarray,
     return J
 
 
-def stabilité(signal: np.ndarray, 
+def stability(signal: np.ndarray, 
               matBk:np.ndarray,
               nbPoles: int
               ):

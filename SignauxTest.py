@@ -17,7 +17,7 @@ import numpy as np
 def signauxTest(duree: float,
                 samplerate: int,
                 presetSignal: str
-                ) -> tuple[np.ndarray, np.ndarray]:
+                ) -> np.ndarray:
     """_summary_
     Cette fonction génère les différents signaux de test pour tester le fonctionnement
     de l'algorithme. 
@@ -46,11 +46,11 @@ def signauxTest(duree: float,
     ampEnvelope = np.pad(ampEnvelope, (0, t.size - ampEnvelope.size))
 
     if presetSignal == "Envelope":
-        return t, ampEnvelope
+        return ampEnvelope
     
     if presetSignal == "battements":
         signal = np.sin(2*np.pi*440*t) + 0.5 * np.sin(2*np.pi*450*t)
-        return t, signal
+        return signal
 
     if presetSignal == "sinusAleatoires":
         taille = 10
@@ -64,8 +64,8 @@ def signauxTest(duree: float,
         for i in range(amplitudes.shape[0]):
             signal += ampEnvelope * amplitudes[i] * np.sin(2*np.pi*frequences[i]*t)
  
-        return t, signal 
-        
+        return signal 
+
     
     diapason = 600
     fondamental = diapason * 0.5
@@ -84,7 +84,7 @@ def signauxTest(duree: float,
     # Simple diapasion
     if presetSignal == "diapason":
         signal = np.sin(2*np.pi*diapason*t)
-        return t, signal
+        return signal
     
     
     # Corde idéale
@@ -92,14 +92,14 @@ def signauxTest(duree: float,
         signal += np.sin(2*np.pi*i*t)
     
     if presetSignal == "cordeIdeale":
-        return t, signal    
+        return signal    
 
 
     # Ajout de l'envelope d'amplitude
     signal = ampEnvelope*signal
     
     if presetSignal == "guitareSimulee":
-        return t, signal
+        return signal
     
     
     # Ajout des modes de corps
@@ -107,7 +107,7 @@ def signauxTest(duree: float,
         signal += ampEnvelope * np.sin(2*np.pi*i*t)
   
     if presetSignal == "guitareCorps":
-        return t, signal
+        return signal
 
 
     # Ajout des modes doubles
@@ -115,7 +115,7 @@ def signauxTest(duree: float,
         signal += ampEnvelope * np.sin(2*np.pi*1.01*i*t)
            
     if presetSignal == "guitareModesDoubles":
-       return t, signal 
+       return signal 
 
 
     # Ajout du bruit
@@ -123,8 +123,8 @@ def signauxTest(duree: float,
     signal += bruit
     
     if presetSignal == "guitareBruit":
-        return t, signal
+        return signal
                     
     else:
         print("Mauvais paramètre")
-        return t, signal
+        return signal

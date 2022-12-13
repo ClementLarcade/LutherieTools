@@ -35,13 +35,13 @@ def Preset(preset: str,
 
     if preset == "gen":
         
-        samplerate = 44100
+        samplerate = 48000
         duree = 2
-        t, signal = signauxTest(duree, samplerate, signalPreset)
+        signal = signauxTest(duree, samplerate, signalPreset)
             
         horizon = 0.05
-        overlap = 0.15
-        nbPoles = 2
+        overlap = 0.
+        nbPoles = 50
 
         
     elif preset == "sample":
@@ -66,9 +66,9 @@ def Preset(preset: str,
         #signal, samplerate = Fonctions.decimation(signal, samplerate, newSamplerate)
         
         
-        horizon = 0.02
-        overlap = 0.15
-        nbPoles = 5
+        horizon = 0.05
+        overlap = 0.
+        nbPoles = 50
         
         
     elif preset == 'json': 

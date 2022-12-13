@@ -26,6 +26,7 @@ signalPreset = "diapason"
 # guitareSimulee, guitareCorps, guitareModesDoubles, guitareBruit
 
 paramsPath = ''
+affichager = False
 
 # forme d'appel : python mainHROgramme.py args.json 
 
@@ -49,7 +50,7 @@ print(f"horizon = {horizon}")
 print(f"overlap = {overlap}")
 print(f"nbPoles = {nbPoles}")
 
-matFk, matKsik, matBk, matJk = HROgramme(signal,
+matFk, matBk, matKsik, matJk = HROgramme(signal,
                                          samplerate,
                                          horizon,
                                          overlap,
@@ -58,6 +59,12 @@ matFk, matKsik, matBk, matJk = HROgramme(signal,
 
 T = repmat(np.linspace(0, signalLength, matFk.shape[1]), nbPoles, 1)
 
+
+# Calcul des perfs
+
+timeFin = perf_counter()
+timeTotal = timeFin - timeDebut
+print(f"temps d'execution = {timeTotal}")
 
 
 #%% Export en json des matrices 
@@ -72,12 +79,6 @@ if preset == "json" or preset == 'jsonConsole':
     Fonctions.exportJson(T,     "exports/" + exportFolder + "/T.json")
 
 
-# Calcul des perfs
-
-timeFin = perf_counter()
-timeTotal = timeFin - timeDebut
-print(f"temps d'execution = {timeTotal}")
-
 
 #%% affichage
 
@@ -86,48 +87,16 @@ print(f"temps d'execution = {timeTotal}")
 
 #matBk = matBk/np.nanmax(matBk)
 
+
+
+
 matBkdB = 20*np.log10(matBk)
 matBkSeuil = Fonctions.seuil(matBkdB, -60)
 
-
-plt.close('all')
-ylim = (0, 1600)
-
-
-if preset == "gen": plotTitle = signalPreset
-
-else: plotTitle = "HROGramme"
-
-affichage(matFk,
-          matBkSeuil,
-          matKsik,
-          matJk,
-          signalPreset=preset
-          )
+if affichager:
+    affichage(signal, samplerate, matFk, matBkSeuil, matKsik, matJk, T, signalPreset=preset)
 
 
-
-
-# Passer tout ca dans son fichier perso
-###############################################
-fig, ax1 = plt.subplots(figsize = (6, 8))
-
-ax = ax1
-#ax.set_facecolor("#440154")
-plot = ax.scatter(T[:], 
-                  matFk[:],
-                  s = 5,
-                  c = matBkSeuil[:],
-                  cmap = "Reds"
-                  )
-ax.set_xlim((0, signal.size/samplerate))
-ax.set_ylim(ylim[0], ylim[1])
-ax.set_title(plotTitle, fontsize = "13")
-ax.set_xlabel("Temps (s)", fontsize = "13")
-ax.set_ylabel("Fréquence (Hz)", fontsize = "13")
-fig.colorbar(plot, ax=ax, label = "Amplitude (dB)")
-
-# fig.savefig(f"{signalPreset}.png", dpi = 1000)
 
 
 

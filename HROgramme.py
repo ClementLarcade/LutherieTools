@@ -56,4 +56,4 @@ def HROgramme(signal: np.ndarray,
             matJk[i,j] = np.NaN
         
         
-    return matFk, matKsik, matBk, matJk
+    return matFk, matBk, matKsik, matJk
