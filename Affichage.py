@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import Fonctions
+import fonctions
 
 
 def affichage(signal: np.ndarray,
@@ -9,9 +9,9 @@ def affichage(signal: np.ndarray,
               matBk: np.ndarray,
               matKsik: np.ndarray,
               matJk: np.ndarray,
-              T:np.ndarray,
+              T: np.ndarray,
               signalPreset: str,
-              save = False
+              save: bool = False
               ) -> None:
     
     

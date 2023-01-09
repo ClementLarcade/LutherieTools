@@ -6,10 +6,14 @@ from os import mkdir
 
 from time import perf_counter
 
-from HROgramme import HROgramme
-import Fonctions
-from Preset import Preset
-from Affichage import affichage
+from hrogramme import HROgramme
+import fonctions
+from preset import Preset
+import affichage
+
+from typing import TypeAlias, Any
+Matrice: TypeAlias = np.ndarray[Any, np.dtype[np.float64]]
+
 
 timeDebut = perf_counter()
 
@@ -19,31 +23,38 @@ timeDebut = perf_counter()
 # trouver des plages de variations pour les params d'étude
 
 
-preset = "gen"     
+preset: str = "gen"     
 # "gen","sample" ou "json" 
-signalPreset = "diapason"
+signalPreset: str = "diapason"
 # Envelope, battements, sinusAleatoires, diapason, cordeIdeale
 # guitareSimulee, guitareCorps, guitareModesDoubles, guitareBruit
 
-paramsPath = ''
-affichager = False
+paramsPath: str = ''
+afficher: bool = False
+
+signal: np.ndarray = np.array([])
+samplerate: int = 0
+horizon: float = 0.
+overlap: float = 0.
+nbPoles: int = 0
+exportFolder: str = ""
 
 # forme d'appel : python mainHROgramme.py args.json 
 
 if len(argv) > 1:
     paramsPath = argv[1]
-    preset = "json"
+    preset: str = "json"
     
 (signal, samplerate, horizon, 
  overlap, nbPoles, exportFolder) = Preset(preset, 
                                           paramsPath,
-                                          signalPreset=signalPreset
+                                          signalPreset
                                           )
 signal = np.array(signal)
 
 # Process
 
-signalLength = signal.size/samplerate
+signalLength: float = signal.size/samplerate
 
 print(f"samplerate = {samplerate}")
 print(f"horizon = {horizon}")
@@ -57,13 +68,13 @@ matFk, matBk, matKsik, matJk = HROgramme(signal,
                                          nbPoles
                                          )
 
-T = repmat(np.linspace(0, signalLength, matFk.shape[1]), nbPoles, 1)
+T: np.ndarray = repmat(np.linspace(0, signalLength, matFk.shape[1]), nbPoles, 1)
 
 
 # Calcul des perfs
 
-timeFin = perf_counter()
-timeTotal = timeFin - timeDebut
+timeFin: float = perf_counter()
+timeTotal: float = timeFin - timeDebut
 print(f"temps d'execution = {timeTotal}")
 
 
@@ -72,11 +83,11 @@ print(f"temps d'execution = {timeTotal}")
 if preset == "json" or preset == 'jsonConsole':
     
     mkdir("exports/" + exportFolder)
-    Fonctions.exportJson(matFk, "exports/" + exportFolder + "/Fk.json")
-    Fonctions.exportJson(matBk, "exports/" + exportFolder + "/Bk.json")
-    Fonctions.exportJson(matBk, "exports/" + exportFolder + "/Ksik.json")
-    Fonctions.exportJson(matJk, "exports/" + exportFolder + "/Jk.json")
-    Fonctions.exportJson(T,     "exports/" + exportFolder + "/T.json")
+    fonctions.exportJson(matFk, "exports/" + exportFolder + "/Fk.json")
+    fonctions.exportJson(matBk, "exports/" + exportFolder + "/Bk.json")
+    fonctions.exportJson(matBk, "exports/" + exportFolder + "/Ksik.json")
+    fonctions.exportJson(matJk, "exports/" + exportFolder + "/Jk.json")
+    fonctions.exportJson(T,     "exports/" + exportFolder + "/T.json")
 
 
 
@@ -90,11 +101,11 @@ if preset == "json" or preset == 'jsonConsole':
 
 
 
-matBkdB = 20*np.log10(matBk)
-matBkSeuil = Fonctions.seuil(matBkdB, -60)
+matBkdB: np.ndarray = 20*np.log10(matBk)
+matBkSeuil: np.ndarray = fonctions.seuil(matBkdB, -60)
 
-if affichager:
-    affichage(signal, samplerate, matFk, matBkSeuil, matKsik, matJk, T, signalPreset=preset)
+if afficher:
+    affichage.affichage(signal, samplerate, matFk, matBkSeuil, matKsik, matJk, T, signalPreset=preset)
 
 
 

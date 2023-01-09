@@ -1,4 +1,5 @@
 import numpy as np
+from typing import Literal
 
 
 # signaux tests
@@ -16,7 +17,12 @@ import numpy as np
 
 def signauxTest(duree: float,
                 samplerate: int,
-                presetSignal: str
+                signalPreset: Literal["diapason",
+                                      "cordeIdeale",
+                                      "guitareSimulee", 
+                                      "guitareCorps",
+                                      "guitareModesDoubles", 
+                                      "guitareBruit"]
                 ) -> np.ndarray:
     """_summary_
     Cette fonction génère les différents signaux de test pour tester le fonctionnement
@@ -26,33 +32,33 @@ def signauxTest(duree: float,
     Args:
         duree (float): duree du signal 
         samplerate (int): fréquence d'échantillonnage 
-        presetSignal (str): "Envelope", "battements", "sinusAleatoires", "diapason", "cordeIdeale", "guitareSimulee", "guitareCorps", "guitareModesDobules", "guitareBruit"
+        signalPreset (str): "Envelope", "battements", "sinusAleatoires", "diapason", "cordeIdeale", "guitareSimulee", "guitareCorps", "guitareModesDobules", "guitareBruit"
 
     Returns:
         t, singal : vecteur temps, signal test
     """    
     
-    t = np.arange(0, duree, 1/samplerate)
-    preDelay = 50 # ms
+    t: np.ndarray = np.arange(0, duree, 1/samplerate)
+    preDelay: int = 50 # ms
     
-    attackTime = 50 # ms
-    decayTime = 300
+    attackTime: int = 50 # ms
+    decayTime: int = 300
     
-    prePad = np.zeros(int(preDelay*samplerate*0.001))
-    attackEnvelope = np.flip(1 - np.linspace(0, 1, int(attackTime*samplerate*0.001))**2) 
-    decayEnvelope = np.flip(np.linspace(0, 1, int(decayTime*samplerate*0.001) )**2)
+    prePad: np.ndarray = np.zeros(int(preDelay*samplerate*0.001))
+    attackEnvelope: np.ndarray = np.flip(1 - np.linspace(0, 1, int(attackTime*samplerate*0.001))**2) 
+    decayEnvelope: np.ndarray = np.flip(np.linspace(0, 1, int(decayTime*samplerate*0.001) )**2)
 
-    ampEnvelope = np.concatenate((prePad, attackEnvelope, decayEnvelope))
+    ampEnvelope: np.ndarray = np.concatenate((prePad, attackEnvelope, decayEnvelope))
     ampEnvelope = np.pad(ampEnvelope, (0, t.size - ampEnvelope.size))
 
-    if presetSignal == "Envelope":
+    if signalPreset == "Envelope":
         return ampEnvelope
     
-    if presetSignal == "battements":
+    if signalPreset == "battements":
         signal = np.sin(2*np.pi*440*t) + 0.5 * np.sin(2*np.pi*450*t)
         return signal
 
-    if presetSignal == "sinusAleatoires":
+    if signalPreset == "sinusAleatoires":
         taille = 10
         
         amplitudes = 0.5 * np.random.random(taille) + 0.5
@@ -82,7 +88,7 @@ def signauxTest(duree: float,
 
 
     # Simple diapasion
-    if presetSignal == "diapason":
+    if signalPreset == "diapason":
         signal = np.sin(2*np.pi*diapason*t)
         return signal
     
@@ -91,14 +97,14 @@ def signauxTest(duree: float,
     for i in FList:
         signal += np.sin(2*np.pi*i*t)
     
-    if presetSignal == "cordeIdeale":
+    if signalPreset == "cordeIdeale":
         return signal    
 
 
     # Ajout de l'envelope d'amplitude
     signal = ampEnvelope*signal
     
-    if presetSignal == "guitareSimulee":
+    if signalPreset == "guitareSimulee":
         return signal
     
     
@@ -106,7 +112,7 @@ def signauxTest(duree: float,
     for i in FListCorps:
         signal += ampEnvelope * np.sin(2*np.pi*i*t)
   
-    if presetSignal == "guitareCorps":
+    if signalPreset == "guitareCorps":
         return signal
 
 
@@ -114,7 +120,7 @@ def signauxTest(duree: float,
     for i in FList:
         signal += ampEnvelope * np.sin(2*np.pi*1.01*i*t)
            
-    if presetSignal == "guitareModesDoubles":
+    if signalPreset == "guitareModesDoubles":
        return signal 
 
 
@@ -122,7 +128,7 @@ def signauxTest(duree: float,
     bruit = np.random.randn(signal.size) * 0.1
     signal += bruit
     
-    if presetSignal == "guitareBruit":
+    if signalPreset == "guitareBruit":
         return signal
                     
     else:

@@ -1,16 +1,24 @@
-from SignauxTest import signauxTest
+from signauxtest import signauxTest
 from scipy.io.wavfile import read
-import Fonctions
+import fonctions
 import json
 from time import time
 import numpy as np
+
+from typing import Literal
+
 
 
 
 def Preset(preset: str,
            paramsPath: str,
-           signalPreset = "diapason"
-           ) -> tuple[np.ndarray, float, float, float, int, str ]:
+           signalPreset: Literal["diapason",
+                                 "cordeIdeale",
+                                 "guitareSimulee", 
+                                 "guitareCorps",
+                                 "guitareModesDoubles", 
+                                 "guitareBruit"]
+           ) -> tuple[np.ndarray, int, float, float, int, str ]:
     """
     Fonction déterminant quel signal et paramètres on utilisera : 
     - "gen" : signal généré
@@ -26,11 +34,11 @@ def Preset(preset: str,
         tuple[np.ndarray, float, float, float, int, str ]:
         signal, samplerate, horizon, overlap, nbPoles, exportFolder
     """    
-    signal = np.array([])
-    samplerate = 0
-    horizon = 0.
-    overlap = 0.
-    nbPoles = 0
+    signal: np.ndarray = np.array([])
+    samplerate: int = 0
+    horizon: float = 0.
+    overlap: float = 0.
+    nbPoles: int = 0
 
 
     if preset == "gen":
@@ -59,7 +67,7 @@ def Preset(preset: str,
         
         # Preparation du signal diminution de la samplerate
         
-        newSamplerate = samplerate / 2
+        newSamplerate: int = int(samplerate / 2)
         
         # on remarque que pour une samplerate < 15000 Hz l'algo affiche n'importe quoi
         
@@ -89,12 +97,12 @@ def Preset(preset: str,
         
         #exportFolder = argsDict["exportFolder"]
         
-        newSamplerate = samplerate / 2
+        newSamplerate: int = int(samplerate / 2)
             
-        signal, samplerate = Fonctions.decimation(signal, samplerate, newSamplerate)
+        signal, samplerate = fonctions.decimation(signal, samplerate, newSamplerate)
 
     
-    exportFolder = "export_" + str(int(time()))
+    exportFolder: str = "export_" + str(int(time()))
     
     signal = signal/np.max(signal)
         

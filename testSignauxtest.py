@@ -1,4 +1,4 @@
-from SignauxTest import signauxTest
+from signauxtest import signauxTest
 import numpy as np
 import matplotlib.pyplot as plt
 

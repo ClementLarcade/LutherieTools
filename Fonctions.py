@@ -6,6 +6,7 @@ from codecs import open
 from functools import wraps
 import matplotlib.pyplot as plt
 
+
 """"
 Ester : calculer la matrice U depuis ESPRIT
 puis en fonction d'une variable de choix d'algo d'estimation 
@@ -55,9 +56,9 @@ def exportJson(mat: np.ndarray,
 def decimation(signal: np.ndarray,
                samplerate: int,
                newSamplerate: int
-               ) -> tuple[np.ndarray, float]:
+               ) -> tuple[np.ndarray, int]:
     
-    facteur = int(samplerate/newSamplerate)
+    facteur: int = int(samplerate/newSamplerate)
     signal = decimate(signal, facteur, ftype = 'fir') # fonction scipy
     
     
@@ -68,7 +69,7 @@ def seuil(inputArray: np.ndarray,
           seuil: float
           ) -> np.ndarray:
     
-    array = np.zeros_like(inputArray)    
+    array: np.ndarray = np.zeros_like(inputArray)    
     
     for (i,j), x in np.ndenumerate(inputArray):
         if x < seuil:
@@ -137,39 +138,42 @@ def ESPRIT(signal: np.ndarray,
     """    
     # contient également l'implémentation du critère ESTER 
     
-    N = signal.shape[0]
+    N: int = signal.shape[0]
 
-    M = int(N/3)
-    L = N - M + 1 # M vaut N /3 et l vaut horizon - M + 1
+    M: int = int(N/3)
+    L: int = N - M + 1 # M vaut N /3 et l vaut horizon - M + 1
 
-    H = hankel(signal[0 : M], signal[L : -1])
-    C =  1/L * H @ H.T
+    H: np.ndarray = hankel(signal[0 : M], signal[L : -1])
+    C: np.ndarray =  1/L * H @ H.T
   
     W, _V, _L = np.linalg.svd(C, full_matrices=False)
     del _V, _L
     
     W = W[:, 0: nbPoles]
-    Wup = W[1: -1, :]
-    Wdown = W[0: -2, :]
+    Wup: np.ndarray = W[1: -1, :]
+    Wdown: np.ndarray = W[0: -2, :]
     
-    Rk = np.linalg.pinv(Wdown) @ Wup
+    Rk: np.ndarray = np.linalg.pinv(Wdown) @ Wup
 
-    Z = np.linalg.eig(Rk)[0]
+    Z: np.ndarray = np.linalg.eig(Rk)[0]
     
     
     # Calcul du critère ESTER
     
-    nbPolesMax = int(nbPoles/2)
+    nbPolesMax: int = int(nbPoles/2)
     
-    J = np.zeros(nbPolesMax)
+    J: np.ndarray = np.zeros(nbPolesMax)
     
     for pole in range(1, nbPolesMax + 1):
         
-        Ws = W[:, 0: pole]
-        Wup = Ws[1: -1, :]
-        Wdown = Ws[0: -2, :]
-        Rk = np.linalg.pinv(Wdown) @ Wup
-        E = Wup - Wdown @ Rk
+        Ws: np.ndarray = W[:, 0: pole]
+        Wup: np.ndarray = Ws[1: -1, :]
+        Wdown: np.ndarray = Ws[0: -2, :]
+        
+        Rk: np.ndarray = np.linalg.pinv(Wdown) @ Wup
+        
+        E: np.ndarray = Wup - Wdown @ Rk
+        
         J[pole - 1] = 1/np.linalg.norm(E, 2)
     
     return Z, J
@@ -200,16 +204,16 @@ def parametres(signal: np.ndarray,
         tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]: _description_
     """    
    
-    Hamm = np.hamming(signal.size)
+    Hamm: np.ndarray = np.hamming(signal.size)
     signal *= Hamm
     
     signal_z, J= ESPRIT(signal, 2*nbPoles)
     
     # régler le pb de dimension de signal_Z dans np.linalg.eig()
     
-    f = np.angle(signal_z) * samplerate/(2*np.pi)
-    ksi = -np.log(abs(signal_z))*samplerate
-    b = moindreCarres(signal_z, signal)    
+    f: np.ndarray = np.angle(signal_z) * samplerate/(2*np.pi)
+    ksi: np.ndarray = -np.log(abs(signal_z))*samplerate
+    b: np.ndarray = moindreCarres(signal_z, signal)    
     
     f = f[f > 0]
     ksi = ksi[ksi > 0]

@@ -1,30 +1,30 @@
 import numpy as np
-import Fonctions
+import fonctions
 import matplotlib.pyplot as plt
 from copy import deepcopy
 
 
 def HROgramme(signal: np.ndarray,
-              samplerate: float,
+              samplerate: int,
               horizon: float,
               overlap: float,
               nbPoles: int
               ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
 
     
-    signalLength = signal.size
+    signalLength: int = signal.size
     
-    echParHorizon = int(horizon * samplerate)
-    echParRecouvrement = int(echParHorizon * overlap)
-    curseur = 0
+    echParHorizon: int = int(horizon * samplerate)
+    echParRecouvrement: int = int(echParHorizon * overlap)
+    curseur: int = 0
     
-    nbFenetres = int(signalLength/(echParHorizon*(1 - overlap)))
+    nbFenetres: int = int(signalLength/(echParHorizon*(1 - overlap)))
     
     
-    matFk =     np.zeros((nbPoles, nbFenetres))
-    matKsik =   np.zeros((nbPoles, nbFenetres))
-    matBk =     np.zeros((nbPoles, nbFenetres))
-    matJk =     np.zeros((nbPoles, nbFenetres))    
+    matFk: np.ndarray =     np.zeros((nbPoles, nbFenetres))
+    matKsik: np.ndarray =   np.zeros((nbPoles, nbFenetres))
+    matBk: np.ndarray =     np.zeros((nbPoles, nbFenetres))
+    matJk: np.ndarray =     np.zeros((nbPoles, nbFenetres))    
     
     print(f"taille de fenetre (samples) = {echParHorizon}")
     print(f'nbFenetres = {nbFenetres}')
@@ -40,9 +40,9 @@ def HROgramme(signal: np.ndarray,
         if curseur + echParHorizon >= signalLength:
             break
         
-        fenetre = deepcopy(signal[curseur : curseur + echParHorizon])
+        fenetre: np.ndarray = deepcopy(signal[curseur : curseur + echParHorizon])
         
-        matFk[:, k], matKsik[:, k], matBk[:, k], matJk[:, k] = Fonctions.parametres(fenetre, samplerate, nbPoles)
+        matFk[:, k], matKsik[:, k], matBk[:, k], matJk[:, k] = fonctions.parametres(fenetre, samplerate, nbPoles)
         
         #matJk[:, k] = Fonctions.esterBd(fenetre, nbPoles)
         
