@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+
 import fonctions
 
 
@@ -20,18 +21,18 @@ def affichage(signal: np.ndarray,
     else: plotTitle = "HROGramme"
 
     plt.close('all')
-    ylim = (0, 1600)
+    ylim = (0, 3000)
 
     # Passer tout ca dans son fichier perso
     ###############################################
-    fig, ax = plt.subplots(figsize = (6, 8))
+    fig, ax = plt.subplots()
 
     #ax.set_facecolor("#440154")
     plot = ax.scatter(T[:], 
                     matFk[:],
                     s = 5,
                     c = matBk[:],
-                    cmap = "Reds"
+                    cmap = "Greys"
                     )
     
     ax.set_xlim((0, signal.size/samplerate))

@@ -1,10 +1,11 @@
+from operator import index
 import numpy as np
+import matplotlib.pyplot as plt
 from scipy.linalg import hankel, svd
 from scipy.signal import decimate
 import json
 from codecs import open
 from functools import wraps
-import matplotlib.pyplot as plt
 
 
 """"
@@ -79,52 +80,27 @@ def seuil(inputArray: np.ndarray,
             
     return array
 
-
-def esterBd(signal: np.ndarray,
-            nbPolesMax: int
-            ) -> np.ndarray:
-    
-    # calcul du parametre ESTER : plus utilisé car intégré dans espritBd pour
-    # pas recalculer la svd longue et gagner en temps de calcul
-    
-    signal = signal[:]
-    N = signal.size
-    H = int(N/3)
-    
-    X = hankel(signal[0 : H], signal[H : -1])
-    H = X @ np.transpose(X)     # @ c'est le produit matriciel
-    
-    U, _V, _L = np.linalg.svd(H)    
-    # essayer avec la SVD de scipy (sans doute plus rapide)
-    del _V, _L
-    
-    J = np.zeros(nbPolesMax)
-    
-    for nbPoles in range(1, nbPolesMax + 1):
+@memoize
+def ESTER(W: np.ndarray, nbPolesMax: int) -> np.ndarray:
         
-        Us = U[:, 0: nbPoles]
-        Uup = Us[1: -1, :]
-        Udown = Us[0: -2, :]
-        phi = np.linalg.pinv(Udown) @ Uup
-        E = Uup - Udown @ phi
-        J[nbPoles - 1] = 1/np.linalg.norm(E, 2)
+    J: np.ndarray = np.zeros(nbPolesMax)
+    
+    for poles in range(nbPolesMax):
         
+        Ws: np.ndarray = W[:, 0: poles+1]
+        Wup: np.ndarray = Ws[1::, :]
+        Wdown: np.ndarray = Ws[0: -1, :]
+        
+        phi: np.ndarray = np.linalg.pinv(Wdown) @ Wup
+        E: np.ndarray = Wup - Wdown @ phi
+        
+        J[poles] = 1/(np.linalg.norm(E, 2)**2)
         
     return J
-
-
-def stability(signal: np.ndarray, 
-              matBk:np.ndarray,
-              nbPoles: int
-              ):
-    
-    return
     
 
 @memoize #utiliser pour accélerer l'algorithme ESPRIT en réutilisant les valeurs déja calculées
-def ESPRIT(signal: np.ndarray,
-           nbPoles: int
-           ) -> tuple[np.ndarray, np.ndarray]:
+def ESPRIT(signal: np.ndarray, nbPoles: int) -> tuple[np.ndarray, np.ndarray]:
     """
     Appel de l'algorithme ESPRIT pour la détermination des paramêtres du signal
     Appelle également l'algorithme d'estimation ESTER pour déterminer l'ordre du modèle
@@ -146,7 +122,7 @@ def ESPRIT(signal: np.ndarray,
     H: np.ndarray = hankel(signal[0 : M], signal[L : -1])
     C: np.ndarray =  1/L * H @ H.T
   
-    W, _V, _L = np.linalg.svd(C, full_matrices=False)
+    W, _V, _L = svd(C, full_matrices=False)
     del _V, _L
     
     W = W[:, 0: nbPoles]
@@ -154,39 +130,32 @@ def ESPRIT(signal: np.ndarray,
     Wdown: np.ndarray = W[0: -2, :]
     
     Rk: np.ndarray = np.linalg.pinv(Wdown) @ Wup
-
     Z: np.ndarray = np.linalg.eig(Rk)[0]
     
-    
+
     # Calcul du critère ESTER
     
-    nbPolesMax: int = int(nbPoles/2)
-    
-    J: np.ndarray = np.zeros(nbPolesMax)
-    
-    for pole in range(1, nbPolesMax + 1):
-        
-        Ws: np.ndarray = W[:, 0: pole]
-        Wup: np.ndarray = Ws[1: -1, :]
-        Wdown: np.ndarray = Ws[0: -2, :]
-        
-        Rk: np.ndarray = np.linalg.pinv(Wdown) @ Wup
-        
-        E: np.ndarray = Wup - Wdown @ Rk
-        
-        J[pole - 1] = 1/np.linalg.norm(E, 2)
+    J = ESTER(W, int(nbPoles/2))
     
     return Z, J
 
     
-def moindreCarres(vecPoles: np.ndarray,
-                  signal: np.ndarray
-                  ) -> np.ndarray:
+def moindreCarres(vecPoles: np.ndarray, signal: np.ndarray) -> np.ndarray:
     
-    Ve = np.transpose(np.vander(vecPoles, signal.size))
+    Ve = np.vander(vecPoles, signal.size).T
     b = np.linalg.pinv(Ve) @ signal
     
     return b
+
+
+def vdm(z: np.ndarray, N: int) -> np.ndarray:
+
+    n = np.arange(0, N - 1)
+    V = np.exp(n @ np.log(z))
+
+    V[np.isnan(V)] = 0
+    
+    return V
 
 
 def parametres(signal: np.ndarray, 
@@ -203,26 +172,28 @@ def parametres(signal: np.ndarray,
     Returns:
         tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]: _description_
     """    
-   
-    Hamm: np.ndarray = np.hamming(signal.size)
-    signal *= Hamm
+
     
-    signal_z, J= ESPRIT(signal, 2*nbPoles)
+    signalZ, J= ESPRIT(signal, 2*nbPoles)
     
     # régler le pb de dimension de signal_Z dans np.linalg.eig()
     
-    f: np.ndarray = np.angle(signal_z) * samplerate/(2*np.pi)
-    ksi: np.ndarray = -np.log(abs(signal_z))*samplerate
-    b: np.ndarray = moindreCarres(signal_z, signal)    
+    f: np.ndarray = np.angle(signalZ) * samplerate/(2*np.pi)
+    b: np.ndarray = moindreCarres(signalZ, signal)    
+    ksi: np.ndarray = -np.log10(abs(signalZ))*samplerate
     
     f = f[f > 0]
-    ksi = ksi[ksi > 0]
     b = np.abs(b[np.imag(b) > 0])  
+    ksi = ksi[ksi > 0]
     
     f = np.resize(f, (nbPoles))
-    ksi = np.resize(ksi, (nbPoles)) 
-    #pb de dimension des ksik
     b = np.resize(b, (nbPoles))
-    
-    
-    return f, ksi, b, J
+    ksi = np.resize(ksi, (nbPoles)) 
+
+    # tri des vecteurs de parameteres
+    indexes = np.argsort(f)
+    f = f[indexes]
+    b = b[indexes]
+    ksi = ksi[indexes]
+
+    return f, b, ksi, J

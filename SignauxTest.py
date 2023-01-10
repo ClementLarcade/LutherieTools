@@ -17,7 +17,7 @@ from typing import Literal
 
 def signauxTest(duree: float,
                 samplerate: int,
-                signalPreset: Literal["diapason",
+                presetSignal: Literal["diapason",
                                       "cordeIdeale",
                                       "guitareSimulee", 
                                       "guitareCorps",
@@ -38,99 +38,94 @@ def signauxTest(duree: float,
         t, singal : vecteur temps, signal test
     """    
     
-    t: np.ndarray = np.arange(0, duree, 1/samplerate)
-    preDelay: int = 50 # ms
-    
-    attackTime: int = 50 # ms
-    decayTime: int = 300
-    
-    prePad: np.ndarray = np.zeros(int(preDelay*samplerate*0.001))
-    attackEnvelope: np.ndarray = np.flip(1 - np.linspace(0, 1, int(attackTime*samplerate*0.001))**2) 
-    decayEnvelope: np.ndarray = np.flip(np.linspace(0, 1, int(decayTime*samplerate*0.001) )**2)
-
-    ampEnvelope: np.ndarray = np.concatenate((prePad, attackEnvelope, decayEnvelope))
-    ampEnvelope = np.pad(ampEnvelope, (0, t.size - ampEnvelope.size))
-
-    if signalPreset == "Envelope":
-        return ampEnvelope
-    
-    if signalPreset == "battements":
-        signal = np.sin(2*np.pi*440*t) + 0.5 * np.sin(2*np.pi*450*t)
-        return signal
-
-    if signalPreset == "sinusAleatoires":
-        taille = 10
-        
-        amplitudes = 0.5 * np.random.random(taille) + 0.5
-        frequences = 1000 * np.random.random(taille) + 100
-        print(f"amplitudes = {amplitudes}")
-        print(f"frequences = {frequences}")
-        signal = np.zeros_like(t)
-        
-        for i in range(amplitudes.shape[0]):
-            signal += ampEnvelope * amplitudes[i] * np.sin(2*np.pi*frequences[i]*t)
- 
-        return signal 
-
-    
-    diapason = 600
-    fondamental = diapason * 0.5
-    
-    FList = [fondamental,
-            2*fondamental,
-            3*fondamental,
-            4*fondamental,
-            5*fondamental]
-    
-    FListCorps = [40, 50, 60, 70]
-    
-    signal = np.zeros_like(t)
+    preDelay = 50 #ms
+    prePad = np.zeros(int(0.001*50*samplerate))
 
 
-    # Simple diapasion
-    if signalPreset == "diapason":
+    duree = duree - 0.001* preDelay
+    t = np.arange(0, duree, 1/samplerate)
+
+    diapason: int = 440 #Hz
+    freqMiGrave: float = 82.0 #Hz
+    nHarmoniques:int = 40
+    vecFrequences = np.arange(freqMiGrave, nHarmoniques*freqMiGrave, freqMiGrave)
+    damping: float = 1E-2
+    bodydamping: float = 0.1
+    inharmonicdamping: float = 5*damping
+    modesCorps = [90, 200, 250]
+    inharmonicCoefficient: float = 1E-4
+
+    # diapason simple
+    if presetSignal == "diapason":
         signal = np.sin(2*np.pi*diapason*t)
-        return signal
     
-    
-    # Corde idéale
-    for i in FList:
-        signal += np.sin(2*np.pi*i*t)
-    
-    if signalPreset == "cordeIdeale":
-        return signal    
-
-
-    # Ajout de l'envelope d'amplitude
-    signal = ampEnvelope*signal
-    
-    if signalPreset == "guitareSimulee":
-        return signal
-    
-    
-    # Ajout des modes de corps
-    for i in FListCorps:
-        signal += ampEnvelope * np.sin(2*np.pi*i*t)
-  
-    if signalPreset == "guitareCorps":
         return signal
 
+    # corde ideale : empilement de sinusoides
+    elif presetSignal == "cordeIdeale":
+        signal = np.zeros_like(t)
 
-    # Ajout des modes doubles
-    for i in FList:
-        signal += ampEnvelope * np.sin(2*np.pi*1.01*i*t)
-           
-    if signalPreset == "guitareModesDoubles":
-       return signal 
+        for freq in vecFrequences:
+            signal += np.sin(2*np.pi*freq*t)
 
-
-    # Ajout du bruit
-    bruit = np.random.randn(signal.size) * 0.1
-    signal += bruit
-    
-    if signalPreset == "guitareBruit":
         return signal
-                    
+
+    # guitare simulee : sinusoides ammorties exponentiellement
+    elif presetSignal == "guitareSimulee":
+        signal = np.zeros_like(t)
+
+        for freq in vecFrequences:
+            signal += np.sin(2*np.pi*freq*t) * np.exp(-damping*freq*t)
+
+        return signal
+
+    # guitare simulee avec les modes de corps
+    elif presetSignal == "guitareCorps":
+        signal = np.zeros_like(t)
+
+        for freq in vecFrequences:
+            signal += np.sin(2*np.pi*freq*t) * np.exp(-damping*freq*t)
+
+        for freq in modesCorps:
+            signal += np.sin(2*np.pi*freq*t) * np.exp(-bodydamping*freq*t)
+
+        return signal
+
+    # guitare simulee avec les modes inharmoniques
+    elif presetSignal == "guitareModesDoubles":
+        signal = np.zeros_like(t)
+
+        for freq in vecFrequences:
+            signal += np.sin(2*np.pi*freq*t) * np.exp(-damping*freq*t)
+            signal += np.sin(2*np.pi*freq*np.sqrt(1+inharmonicCoefficient**2)*t) * np.exp(-inharmonicdamping*freq*t)
+
+        # for freq in modesCorps:
+        #     signal += np.sin(2*np.pi*freq*t) * np.exp(-bodydamping*freq*t)
+
+        return signal
+
+    # guitare avec bruit additif
+    elif presetSignal == "guitareBruit":
+        signal = np.zeros_like(t)
+
+        for freq in vecFrequences:
+            signal += np.sin(2*np.pi*freq*t) * np.exp(-damping*freq*t)
+            signal += np.sin(2*np.pi*freq*np.sqrt(1+inharmonicCoefficient**2)*t) * np.exp(-inharmonicdamping*freq*t)
+
+        for freq in modesCorps:
+            signal += np.sin(2*np.pi*freq*t) * np.exp(-bodydamping*freq*t)
+
+        SNR: int = -10
+        SNRLin = 10**(SNR/20)
+        noise = SNRLin * (2*np.random.rand(t.size) - 1)
+
+        signal += noise
+
+        return signal
+
+
     else:
-        print("Mauvais paramètre")
+        print("mauvais parametre")
+        signal = np.zeros_like(t)
+
         return signal

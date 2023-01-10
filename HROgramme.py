@@ -1,30 +1,30 @@
 import numpy as np
-import fonctions
 import matplotlib.pyplot as plt
 from copy import deepcopy
 
+import fonctions
+from Classes import Params, Matrices 
 
-def HROgramme(signal: np.ndarray,
-              samplerate: int,
-              horizon: float,
-              overlap: float,
-              nbPoles: int
-              ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+
+def HROgramme(
+    signal: np.ndarray,
+    params: Params
+    ) -> Matrices:
 
     
     signalLength: int = signal.size
     
-    echParHorizon: int = int(horizon * samplerate)
-    echParRecouvrement: int = int(echParHorizon * overlap)
+    echParHorizon: int = int(params.horizon * params.samplerate)
+    echParRecouvrement: int = int(echParHorizon * params.overlap)
     curseur: int = 0
     
-    nbFenetres: int = int(signalLength/(echParHorizon*(1 - overlap)))
+    nbFenetres: int = int(signalLength/(echParHorizon*(1 - params.overlap)))
     
-    
-    matFk: np.ndarray =     np.zeros((nbPoles, nbFenetres))
-    matKsik: np.ndarray =   np.zeros((nbPoles, nbFenetres))
-    matBk: np.ndarray =     np.zeros((nbPoles, nbFenetres))
-    matJk: np.ndarray =     np.zeros((nbPoles, nbFenetres))    
+    matrices = Matrices()
+    matrices.F: np.ndarray =     np.zeros((params.nbPoles, nbFenetres))
+    matrices.Ksi: np.ndarray =   np.zeros((params.nbPoles, nbFenetres))
+    matrices.B: np.ndarray =     np.zeros((params.nbPoles, nbFenetres))
+    matrices.J: np.ndarray =     np.zeros((params.nbPoles, nbFenetres))    
     
     print(f"taille de fenetre (samples) = {echParHorizon}")
     print(f'nbFenetres = {nbFenetres}')
@@ -42,18 +42,20 @@ def HROgramme(signal: np.ndarray,
         
         fenetre: np.ndarray = deepcopy(signal[curseur : curseur + echParHorizon])
         
-        matFk[:, k], matKsik[:, k], matBk[:, k], matJk[:, k] = fonctions.parametres(fenetre, samplerate, nbPoles)
+        parametresEstimes = fonctions.parametres(fenetre, params.samplerate, params.nbPoles)
+        matrices.F[:, k] = parametresEstimes[0]
+        matrices.B[:, k] = parametresEstimes[1] 
+        matrices.Ksi[:, k] = parametresEstimes[2]
+        matrices.J[:, k] = parametresEstimes[3]
         
-        #matJk[:, k] = Fonctions.esterBd(fenetre, nbPoles)
         
-        
-    for (i,j), x in np.ndenumerate(matFk):
+    for (i,j), x in np.ndenumerate(matrices.F):
         # Supprimer les frequences calculées au delà de F nyquist
-        if x > 0.5*samplerate:
+        if x > 0.5*params.samplerate:
             
-            matFk[i,j] = np.NaN
-            matBk[i,j] = np.NaN
-            matJk[i,j] = np.NaN
+            matrices.F[i,j] = np.NaN
+            matrices.B[i,j] = np.NaN
+            matrices.J[i,j] = np.NaN
         
         
-    return matFk, matBk, matKsik, matJk
+    return matrices

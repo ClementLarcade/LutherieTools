@@ -3,16 +3,16 @@ from numpy.matlib import repmat
 import matplotlib.pyplot as plt
 from sys import argv
 from os import mkdir
-
 from time import perf_counter
+from typing import TypeAlias, Any
+Matrice: TypeAlias = np.ndarray[Any, np.dtype[np.float64]]
 
 from hrogramme import HROgramme
 import fonctions
-from preset import Preset
+import preset
 import affichage
-
-from typing import TypeAlias, Any
-Matrice: TypeAlias = np.ndarray[Any, np.dtype[np.float64]]
+from stability import stability
+from Classes import Params, Matrices
 
 
 timeDebut = perf_counter()
@@ -23,52 +23,38 @@ timeDebut = perf_counter()
 # trouver des plages de variations pour les params d'étude
 
 
-preset: str = "gen"     
+argvPreset: str = "gen"     
 # "gen","sample" ou "json" 
-signalPreset: str = "diapason"
+signalPreset: str = "guitareBruit"
 # Envelope, battements, sinusAleatoires, diapason, cordeIdeale
 # guitareSimulee, guitareCorps, guitareModesDoubles, guitareBruit
 
 paramsPath: str = ''
-afficher: bool = False
+afficher: bool = True
 
 signal: np.ndarray = np.array([])
-samplerate: int = 0
-horizon: float = 0.
-overlap: float = 0.
-nbPoles: int = 0
 exportFolder: str = ""
 
 # forme d'appel : python mainHROgramme.py args.json 
 
 if len(argv) > 1:
     paramsPath = argv[1]
-    preset: str = "json"
+    argvPreset: str = "json"
     
-(signal, samplerate, horizon, 
- overlap, nbPoles, exportFolder) = Preset(preset, 
-                                          paramsPath,
-                                          signalPreset
-                                          )
-signal = np.array(signal)
+(signal, params, exportFolder) = preset.preset(argvPreset, paramsPath, signalPreset)
 
 # Process
 
-signalLength: float = signal.size/samplerate
+signalLength: float = signal.size/params.samplerate
 
-print(f"samplerate = {samplerate}")
-print(f"horizon = {horizon}")
-print(f"overlap = {overlap}")
-print(f"nbPoles = {nbPoles}")
+print(f"samplerate = {params.samplerate}")
+print(f"horizon = {params.horizon}")
+print(f"overlap = {params.overlap}")
+print(f"nbPoles = {params.nbPoles}")
 
-matFk, matBk, matKsik, matJk = HROgramme(signal,
-                                         samplerate,
-                                         horizon,
-                                         overlap,
-                                         nbPoles
-                                         )
+matrices = HROgramme(signal, params)
 
-T: np.ndarray = repmat(np.linspace(0, signalLength, matFk.shape[1]), nbPoles, 1)
+matrices.T = repmat(np.linspace(0, signalLength, matrices.F.shape[1]), params.nbPoles, 1)
 
 
 # Calcul des perfs
@@ -80,32 +66,38 @@ print(f"temps d'execution = {timeTotal}")
 
 #%% Export en json des matrices 
 
-if preset == "json" or preset == 'jsonConsole':
+if argvPreset == "json":
     
     mkdir("exports/" + exportFolder)
-    fonctions.exportJson(matFk, "exports/" + exportFolder + "/Fk.json")
-    fonctions.exportJson(matBk, "exports/" + exportFolder + "/Bk.json")
-    fonctions.exportJson(matBk, "exports/" + exportFolder + "/Ksik.json")
-    fonctions.exportJson(matJk, "exports/" + exportFolder + "/Jk.json")
-    fonctions.exportJson(T,     "exports/" + exportFolder + "/T.json")
+    fonctions.exportJson(matrices.F, "exports/" + exportFolder + "/F.json")
+    fonctions.exportJson(matrices.B, "exports/" + exportFolder + "/B.json")
+    fonctions.exportJson(matrices.B, "exports/" + exportFolder + "/Ksi.json")
+    fonctions.exportJson(matrices.J, "exports/" + exportFolder + "/J.json")
+    fonctions.exportJson(matrices.T,     "exports/" + exportFolder + "/T.json")
 
 
 
 #%% affichage
 
-
 # seuillage des Bk
+tolerancestabilite = 1
+numcolstoverify = 2
+matrices.FStable = stability(matrices.F, numcolstoverify, tolerancestabilite)
 
-#matBk = matBk/np.nanmax(matBk)
-
-
-
-
-matBkdB: np.ndarray = 20*np.log10(matBk)
-matBkSeuil: np.ndarray = fonctions.seuil(matBkdB, -60)
+matrices.BdB = 20*np.log10(matrices.B)
+matrices.BdBSeuil = fonctions.seuil(matrices.BdB, -60)
 
 if afficher:
-    affichage.affichage(signal, samplerate, matFk, matBkSeuil, matKsik, matJk, T, signalPreset=preset)
+    affichage.affichage(signal, 
+                        params.samplerate, 
+                        matrices.F, 
+                        matrices.B, 
+                        matrices.Ksi, 
+                        matrices.J, 
+                        matrices.T, 
+                        signalPreset=argvPreset
+                        )
+
 
 
 

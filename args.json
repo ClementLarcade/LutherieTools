@@ -1,6 +1,6 @@
 {
     "filepath": "Clips audio/Violon.wav",
-    "horizon" : 0.05,
+    "horizon" : 0.025,
     "overlap" : 0,
     "nbPoles" : 50,
     "samplerate" : 48000
