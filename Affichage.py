@@ -1,50 +1,34 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-import fonctions
 
-
-def affichage(signal: np.ndarray,
-              samplerate: float,
-              matFk: np.ndarray,
-              matBk: np.ndarray,
-              matKsik: np.ndarray,
-              matJk: np.ndarray,
-              T: np.ndarray,
-              signalPreset: str,
-              save: bool = False
-              ) -> None:
+def affichage(
+    frequences: np.ndarray,
+    color: np.ndarray, 
+    temps: np.ndarray, 
+    signalPreset: str, 
+    datatoplot: str,
+    critere: str,
+    save: bool
+    ) -> None:
     
+
+    plt.close("all")
     
-    if signalPreset == "gen": plotTitle = signalPreset
-
-    else: plotTitle = "HROGramme"
-
-    plt.close('all')
-    ylim = (0, 3000)
-
-    # Passer tout ca dans son fichier perso
-    ###############################################
+    ylimit = (0, 3500)
+    
     fig, ax = plt.subplots()
 
-    #ax.set_facecolor("#440154")
-    plot = ax.scatter(T[:], 
-                    matFk[:],
-                    s = 5,
-                    c = matBk[:],
-                    cmap = "Greys"
-                    )
+    graph = ax.scatter(temps, frequences, s=15, c=color, cmap = "jet")
+    ax.set_ylim(ylimit)
+    ax.set_xlim(0, temps[0, -1])
+    ax.set_title(f"{datatoplot} - {signalPreset} - {critere}")
+    ax.set_xlabel("Temps (s)")
+    ax.set_ylabel("Fréquence (Hz)")
+
+    plt.colorbar(graph)
+    ax.grid(True)
     
-    ax.set_xlim((0, signal.size/samplerate))
-    ax.set_ylim(ylim[0], ylim[1])
-    ax.set_title(plotTitle, fontsize = "13")
-    ax.set_xlabel("Temps (s)", fontsize = "13")
-    ax.set_ylabel("Fréquence (Hz)", fontsize = "13")
-    fig.colorbar(plot, ax=ax, label = "Amplitude (dB)")
+    #ax.plot([temps[0,0], temps[0, -1]], [440, 440])
 
-
-    if save: fig.savefig(f"{signalPreset}.png", dpi = 1000)
-
-    plt.show()
-    
     return

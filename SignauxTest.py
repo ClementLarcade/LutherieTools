@@ -41,7 +41,6 @@ def signauxTest(duree: float,
     preDelay = 50 #ms
     prePad = np.zeros(int(0.001*50*samplerate))
 
-
     duree = duree - 0.001* preDelay
     t = np.arange(0, duree, 1/samplerate)
 
@@ -59,7 +58,6 @@ def signauxTest(duree: float,
     if presetSignal == "diapason":
         signal = np.sin(2*np.pi*diapason*t)
     
-        return signal
 
     # corde ideale : empilement de sinusoides
     elif presetSignal == "cordeIdeale":
@@ -68,7 +66,6 @@ def signauxTest(duree: float,
         for freq in vecFrequences:
             signal += np.sin(2*np.pi*freq*t)
 
-        return signal
 
     # guitare simulee : sinusoides ammorties exponentiellement
     elif presetSignal == "guitareSimulee":
@@ -77,7 +74,6 @@ def signauxTest(duree: float,
         for freq in vecFrequences:
             signal += np.sin(2*np.pi*freq*t) * np.exp(-damping*freq*t)
 
-        return signal
 
     # guitare simulee avec les modes de corps
     elif presetSignal == "guitareCorps":
@@ -89,7 +85,6 @@ def signauxTest(duree: float,
         for freq in modesCorps:
             signal += np.sin(2*np.pi*freq*t) * np.exp(-bodydamping*freq*t)
 
-        return signal
 
     # guitare simulee avec les modes inharmoniques
     elif presetSignal == "guitareModesDoubles":
@@ -97,12 +92,11 @@ def signauxTest(duree: float,
 
         for freq in vecFrequences:
             signal += np.sin(2*np.pi*freq*t) * np.exp(-damping*freq*t)
-            signal += np.sin(2*np.pi*freq*np.sqrt(1+inharmonicCoefficient**2)*t) * np.exp(-inharmonicdamping*freq*t)
+            signal += np.sin(2*np.pi*freq*np.sqrt(1 + inharmonicCoefficient**2)*t) * np.exp(-inharmonicdamping*freq*t)
 
         # for freq in modesCorps:
         #     signal += np.sin(2*np.pi*freq*t) * np.exp(-bodydamping*freq*t)
 
-        return signal
 
     # guitare avec bruit additif
     elif presetSignal == "guitareBruit":
@@ -110,7 +104,7 @@ def signauxTest(duree: float,
 
         for freq in vecFrequences:
             signal += np.sin(2*np.pi*freq*t) * np.exp(-damping*freq*t)
-            signal += np.sin(2*np.pi*freq*np.sqrt(1+inharmonicCoefficient**2)*t) * np.exp(-inharmonicdamping*freq*t)
+            signal += np.sin(2*np.pi*freq * np.sqrt(1 + inharmonicCoefficient**2) * t) * np.exp(-inharmonicdamping*freq*t)
 
         for freq in modesCorps:
             signal += np.sin(2*np.pi*freq*t) * np.exp(-bodydamping*freq*t)
@@ -121,11 +115,10 @@ def signauxTest(duree: float,
 
         signal += noise
 
-        return signal
-
 
     else:
         print("mauvais parametre")
         signal = np.zeros_like(t)
 
-        return signal
+    signal = np.concatenate((prePad, signal))
+    return signal

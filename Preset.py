@@ -6,11 +6,6 @@ from typing import Literal
 from Classes import Params
 
 from signauxtest import signauxTest
-import fonctions
-
-
-
-
 
 
 def preset(preset: str,
@@ -54,7 +49,7 @@ def preset(preset: str,
         
     elif preset == "sample":
         
-        [params.samplerate, signal] = read("Clips audio/Violon.wav")
+        [params.samplerate, signal] = read(f"Clips audio/{signalPreset}.wav")
         
         if signal.ndim > 1:
             # on isole le premier canal
@@ -67,7 +62,7 @@ def preset(preset: str,
         
         params.horizon = 0.05
         params.overlap = 0.
-        params.nbPoles = 50
+        params.nbPoles = 100
         
         
     elif preset == 'json': 
@@ -94,4 +89,3 @@ def preset(preset: str,
     signal = signal/np.max(signal)
         
     return signal, params, exportfolder
-
