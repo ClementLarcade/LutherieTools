@@ -46,7 +46,7 @@ def ESPRIT(signal: np.ndarray, nbPoles: int) -> tuple[np.ndarray, np.ndarray]:
     H: np.ndarray = hankel(signal[0 : M], signal[M : -1])
     C: np.ndarray =  1/L * H @ H.T
   
-    W, _V, _L = svd(C, full_matrices=False, lapack_driver= 'gesdd')
+    W, _V, _L = svd(C, full_matrices=False, overwrite_a=True)
     del _V, _L
     
     W = W[:, 0: nbPoles]

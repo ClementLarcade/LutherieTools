@@ -13,7 +13,6 @@ def affichage(
     ) -> None:
     
 
-    plt.close("all")
     
     ylimit = (0, 3500)
     

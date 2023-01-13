@@ -72,7 +72,7 @@ matrices.FStable = stability(matrices.F, numcolstoverify, tolerancestabilite)
 
 # seuillage de la matrice des B
 matrices.BdB = 20*np.log10(matrices.B)
-matrices.BdBSeuil = fonctions.seuil(matrices.BdB, -150)
+matrices.BdBSeuil = fonctions.seuil(matrices.BdB, -60)
 
 #%% Export en json des matrices 
 
@@ -83,6 +83,16 @@ if argvPreset == "json":
 #%% affichage
 
 if afficher:
+    plt.close("all")
+    
+    affichage.affichage(
+        matrices.F,
+        matrices.BdBSeuil,
+        matrices.T, 
+        signalPreset,
+        "Amplitude (dB)", 
+        "sans critere",
+        False)
     
     affichage.affichage(
         matrices.FStable,
@@ -90,7 +100,7 @@ if afficher:
         matrices.T, 
         signalPreset,
         "Amplitude (dB)", 
-        "sans critere",
+        "Stabilité",
         False)
  
     plt.show()

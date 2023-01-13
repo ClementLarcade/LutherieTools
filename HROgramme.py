@@ -45,19 +45,22 @@ def HROgramme(signal: np.ndarray, params: Params) -> Matrices:
         matrices.J[:, k] = parametresEstimes[3]
         
         
-    antialiasingfilter(matrices, params)
+    antialiasingfilter(matrices, params.samplerate)
         
     return matrices
 
 
-def antialiasingfilter(matrices, params):
+def antialiasingfilter(matrices, samplerate):
 
-    for (i,j), x in np.ndenumerate(matrices.F):
-        # Supprimer les frequences calculées au delà de F nyquist
-        if x > 0.5*params.samplerate:
+    # for (i,j), x in np.ndenumerate(matrices.F):
+    #     # Supprimer les frequences calculées au delà de F nyquist
+    #     if x > 0.5*samplerate:
             
-            matrices.F[i,j] = np.NaN
-            matrices.B[i,j] = np.NaN
-            matrices.J[i,j] = np.NaN
+    #         matrices.F[i,j] = np.NaN
+    #         matrices.B[i,j] = np.NaN
+
+    matrices.F[matrices.F > 0.5*samplerate] = np.NaN
+    matrices.B[matrices.F == np.NaN] = np.NaN
+    matrices.Ksi[matrices.F == np.NaN] = np.NaN
 
     return matrices
