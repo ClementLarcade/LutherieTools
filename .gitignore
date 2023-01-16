@@ -1,2 +1,9 @@
-.vscode/*
-__pychache__/**
+__pycache__/Affichage.cpython-311.pyc
+__pycache__/Classes.cpython-311.pyc
+__pycache__/EstimationParametres.cpython-311.pyc
+__pycache__/Fonctions.cpython-311.pyc
+__pycache__/HROgramme.cpython-311.pyc
+__pycache__/Preset.cpython-311.pyc
+__pycache__/SignauxTest.cpython-311.pyc
+__pycache__/Stability.cpython-311.pyc
+exports/export_1673887562/matrices.json
