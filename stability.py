@@ -18,7 +18,7 @@ def stability(inMatrix: np.ndarray, numcolstoverify: int, tolerance: float) -> n
             modesValides.append(mode)
             
         else:
-            outMatrix[row, col] = -1000
+            outMatrix[row, col] = np.nan
 
 
     return outMatrix

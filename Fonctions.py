@@ -3,7 +3,6 @@ import json
 from codecs import open
 from functools import wraps
 from os import mkdir
-from copy import copy
 
 from Classes import Matrices
 
@@ -35,24 +34,63 @@ def memoize(func):
 
 def export(matrices: Matrices, exportfolder: str) -> None:
 
+    """
+    pour matrices.F, si f == NaN : f = -1000
+    pour matrices.BdBSeuil, si b == NaN : b = nanmin(dBSeuil) et f = -1000
+    pour matrices.Ksi, si ksi == Nan : ksi = 0 
+    """
+
+    deNaNination(matrices)
+
+    matricesDict: dict = {
+        "F" : matrices.F.tolist(),
+        "B" : matrices.BdBSeuil.tolist(),
+        "Ksi" : matrices.Ksi.tolist(),
+        "T" : matrices.T.tolist()
+    }
+
+    filePath = "exports/" + exportfolder + "/matrices.json"
+    
     mkdir("exports/" + exportfolder)
-    exportJson(matrices.F, "exports/" + exportfolder + "/F.json")
-    exportJson(matrices.BdBSeuil, "exports/" + exportfolder + "/B.json")
-    exportJson(matrices.Ksi, "exports/" + exportfolder + "/Ksi.json")
-    exportJson(matrices.J, "exports/" + exportfolder + "/J.json")
-    exportJson(matrices.T, "exports/" + exportfolder + "/T.json")
+
+    json.dump(matricesDict, 
+            open(filePath, 'w', encoding='utf-8'), 
+            separators=(',', ':'), 
+            sort_keys=True, 
+            indent=4) ### this saves the array in .json format
+
+
+    # exportJson(matrices.F, "exports/" + exportfolder + "/F.json")
+    # exportJson(matrices.BdBSeuil, "exports/" + exportfolder + "/B.json")
+    # exportJson(matrices.Ksi, "exports/" + exportfolder + "/Ksi.json")
+    # exportJson(matrices.J, "exports/" + exportfolder + "/J.json")
+    # exportJson(matrices.T, "exports/" + exportfolder + "/T.json")
 
     
     return
 
-def exportJson(mat: np.ndarray, file_path: str) -> None:
-    """
-    Pour exporter les matrices résultats sous forme de fichier .json
 
-    Args:
-        mat (np.ndarray): La matrice à exporter
-        file_path (str): Le chemin où exporter
-    """    
+def deNaNination(matrices: Matrices):
+
+    for index, frequence in np.ndenumerate(matrices.F):
+
+        if frequence is np.NaN: 
+            matrices.F = -1000
+
+        if matrices.BdBSeuil[index] is np.NaN: 
+            matrices.dBSeuil[index] = np.nanmin(matrices.dBSeuil)
+            matrices.F[index] = -1000
+            
+        if matrices.Ksi[index] is np.NaN:            
+            matrices.Ksi[index] = 0
+        
+        matrices.Ksi[:, 0] = np.zeros_like(matrices.Ksi[:,0])
+            
+    return
+
+
+def exportJson(mat: np.ndarray, file_path: str) -> None:
+   
     matList = mat.tolist()# nested lists with same data, indices
     
     json.dump(matList, 
@@ -63,14 +101,20 @@ def exportJson(mat: np.ndarray, file_path: str) -> None:
     
     return 
 
-def seuil(inputarray: np.ndarray, seuil: float) -> np.ndarray:
+
+
+def seuil(matrices: Matrices, seuil: float) -> np.ndarray:
     
-    outpoutarray: np.ndarray = copy(inputarray)    
+    matrices.BdBSeuil = np.zeros_like(matrices.BdB)
     
-    for (i,j), x in np.ndenumerate(inputarray):
+    
+    
+    for (i,j), x in np.ndenumerate(matrices.BdB):
         if x < seuil:
-            outpoutarray[i,j] = -200
+            matrices.BdBSeuil[i,j] = -200
         else:
-            outpoutarray[i,j] = x
+            matrices.BdBSeuil[i,j] = x
             
-    return outpoutarray
+    
+            
+    return 

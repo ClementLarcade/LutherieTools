@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from copy import deepcopy
 
-from estimation_parametres import parametres
+from EstimationParametres import parametres
 from Classes import Params, Matrices 
 
 
@@ -59,7 +59,8 @@ def antialiasingfilter(matrices, samplerate):
     #         matrices.F[i,j] = np.NaN
     #         matrices.B[i,j] = np.NaN
 
-    matrices.F[matrices.F > 0.5*samplerate] = -1000
-    matrices.B[matrices.F == np.NaN] = 0
+    matrices.F[matrices.F > 0.5*samplerate] = np.nan
+    matrices.B[matrices.F is np.nan] = np.nan
+    matrices.Ksi[matrices.F is np.nan] = np.nan
 
     return matrices

@@ -12,6 +12,7 @@ def affichage(
     save: bool
     ) -> None:
     
+    color[color == -200] = np.nan
 
     
     ylimit = (0, 3500)

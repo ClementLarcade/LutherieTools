@@ -8,7 +8,7 @@ from HROgramme import HROgramme
 import Fonctions
 from Preset import preset
 from Affichage import affichage
-from stability import stability
+from Stability import stability
 
 
 timeDebut = perf_counter()
@@ -72,13 +72,12 @@ matrices.FStable = stability(matrices.F, numcolstoverify, tolerancestabilite)
 
 # seuillage de la matrice des B
 matrices.BdB = 20*np.log10(matrices.B)
-matrices.BdBSeuil = Fonctions.seuil(matrices.BdB, -60)
+Fonctions.seuil(matrices, -60)
 
 #%% Export en json des matrices 
 
-if argvPreset == "json":
+if True:
     Fonctions.export(matrices, exportfolder)
-
 
 #%% affichage
 
@@ -102,5 +101,6 @@ if afficher:
         "Amplitude (dB)", 
         "Stabilité",
         False)
- 
+    
     plt.show()
+ 
