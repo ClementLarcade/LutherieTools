@@ -12,7 +12,7 @@ def HROgramme(signal: np.ndarray, params: Params) -> Matrices:
     
     echParHorizon: int = int(params.horizon * params.samplerate)
     echParRecouvrement: int = int(echParHorizon * params.overlap)
-    curseur: int = 0
+    pointer: int = 0
     
     nbFenetres: int = int(signalLength/(echParHorizon*(1 - params.overlap)))
     
@@ -30,13 +30,13 @@ def HROgramme(signal: np.ndarray, params: Params) -> Matrices:
         if k %  10 == 0:    
             print(f'{k}/{nbFenetres}')
             
-        curseur = int(k*(echParHorizon - echParRecouvrement) + 1)
+        pointer = int(k*(echParHorizon - echParRecouvrement) + 1)
         
-        if (curseur + echParHorizon) > signalLength:
+        if (pointer + echParHorizon) > signalLength:
             print("sortie de boucle")
             break
         
-        fenetre: np.ndarray = deepcopy(signal[curseur : curseur + echParHorizon])
+        fenetre: np.ndarray = deepcopy(signal[pointer : pointer + echParHorizon])
         
         parametresEstimes = parametres(fenetre, params.samplerate, params.nbPoles)
         matrices.F[:, k] = parametresEstimes[0]
