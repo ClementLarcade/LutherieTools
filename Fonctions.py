@@ -69,7 +69,7 @@ def seuil(inputarray: np.ndarray, seuil: float) -> np.ndarray:
     
     for (i,j), x in np.ndenumerate(inputarray):
         if x < seuil:
-            outpoutarray[i,j] = np.NaN
+            outpoutarray[i,j] = -200
         else:
             outpoutarray[i,j] = x
             

@@ -59,8 +59,7 @@ def antialiasingfilter(matrices, samplerate):
     #         matrices.F[i,j] = np.NaN
     #         matrices.B[i,j] = np.NaN
 
-    matrices.F[matrices.F > 0.5*samplerate] = np.NaN
-    matrices.B[matrices.F == np.NaN] = np.NaN
-    matrices.Ksi[matrices.F == np.NaN] = np.NaN
+    matrices.F[matrices.F > 0.5*samplerate] = -1000
+    matrices.B[matrices.F == np.NaN] = 0
 
     return matrices

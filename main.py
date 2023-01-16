@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 from sys import argv
 from time import perf_counter
 
-from hrogramme import HROgramme
-import fonctions
-import preset
-import affichage
+from HROgramme import HROgramme
+import Fonctions
+from Preset import preset
+from Affichage import affichage
 from stability import stability
 
 
@@ -37,7 +37,7 @@ if len(argv) > 1:
     paramsPath = argv[1]
     argvPreset: str = "json"
     
-(signal, params, exportfolder) = preset.preset(argvPreset, paramsPath, signalPreset)
+(signal, params, exportfolder) = preset(argvPreset, paramsPath, signalPreset)
 
 # Process
 
@@ -72,12 +72,12 @@ matrices.FStable = stability(matrices.F, numcolstoverify, tolerancestabilite)
 
 # seuillage de la matrice des B
 matrices.BdB = 20*np.log10(matrices.B)
-matrices.BdBSeuil = fonctions.seuil(matrices.BdB, -60)
+matrices.BdBSeuil = Fonctions.seuil(matrices.BdB, -60)
 
 #%% Export en json des matrices 
 
 if argvPreset == "json":
-    fonctions.export(matrices, exportfolder)
+    Fonctions.export(matrices, exportfolder)
 
 
 #%% affichage
@@ -85,7 +85,7 @@ if argvPreset == "json":
 if afficher:
     plt.close("all")
     
-    affichage.affichage(
+    affichage(
         matrices.F,
         matrices.BdBSeuil,
         matrices.T, 
@@ -94,7 +94,7 @@ if afficher:
         "sans critere",
         False)
     
-    affichage.affichage(
+    affichage(
         matrices.FStable,
         matrices.BdBSeuil,
         matrices.T, 

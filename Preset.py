@@ -5,7 +5,7 @@ from time import time
 from typing import Literal
 from Classes import Params
 
-from signauxtest import signauxTest
+from SignauxTest import signauxTest
 
 
 def preset(preset: str,
