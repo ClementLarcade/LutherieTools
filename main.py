@@ -76,7 +76,7 @@ Fonctions.seuil(matrices, -60)
 
 #%% Export en json des matrices 
 
-if True:
+if argvPreset == "json":
     Fonctions.export(matrices, exportfolder)
 
 #%% affichage

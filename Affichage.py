@@ -29,6 +29,5 @@ def affichage(
     plt.colorbar(graph)
     ax.grid(True)
     
-    #ax.plot([temps[0,0], temps[0, -1]], [440, 440])
 
     return
