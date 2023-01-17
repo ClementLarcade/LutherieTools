@@ -21,7 +21,7 @@ timeDebut = perf_counter()
 
 argvPreset: str = "sample"     
 # "gen","sample" ou "json" 
-signalPreset: str = "guitareSimulee"
+signalPreset: str = "Violon"
 # Envelope, battements, sinusAleatoires, diapason, cordeIdeale
 # guitareSimulee, guitareCorps, guitareModesDoubles, guitareBruit
 
@@ -36,6 +36,8 @@ exportfolder: str = ""
 if len(argv) > 1:
     paramsPath = argv[1]
     argvPreset: str = "json"
+    afficher = False    
+
     
 (signal, params, exportfolder) = preset(argvPreset, paramsPath, signalPreset)
 

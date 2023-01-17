@@ -7,6 +7,7 @@ class Params:
         self.horizon: float = 0.
         self.overlap: float = 0.
         self.nbPoles: int = 0
+        self.exportfolder: str = ""
 
 
 class Matrices:

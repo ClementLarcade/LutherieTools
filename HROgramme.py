@@ -44,7 +44,6 @@ def HROgramme(signal: np.ndarray, params: Params) -> Matrices:
         matrices.Ksi[:, k] = parametresEstimes[2]
         matrices.J[:, k] = parametresEstimes[3]
         
-        
     antialiasingfilter(matrices, params.samplerate)
         
     return matrices

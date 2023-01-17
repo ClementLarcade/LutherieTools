@@ -42,11 +42,10 @@ def preset(preset: str,
         duree = 2
         signal = signauxTest(duree, params.samplerate, signalPreset)
             
-        params.horizon = 0.05
+        params.horizon = 0.03
         params.overlap = 0.
-        params.nbPoles = 100
+        params.nbPoles = 50
 
-        
     elif preset == "sample":
         
         [params.samplerate, signal] = read(f"Clips audio/{signalPreset}.wav")
@@ -64,7 +63,6 @@ def preset(preset: str,
         params.overlap = 0.
         params.nbPoles = 100
         
-        
     elif preset == 'json': 
         
         argsDict = json.load(open(paramsPath))
@@ -74,17 +72,16 @@ def preset(preset: str,
         if signal.shape[0] > 1:
             signal = signal[:,0]
         
-        
         params.horizon = argsDict["horizon"]
         params.overlap = argsDict["overlap"]
         params.nbPoles = argsDict["nbPoles"]
+        params.exportfolder = argsDict["exportfolder"]
 
         # Preparation 
         
         #exportFolder = argsDict["exportFolder"]
         
-    
-    exportfolder: str = "export_" + str(int(time()))
+    exportfolder: str = "export_" + str(params.exportfolder)
     
     signal = signal/np.max(signal)
         

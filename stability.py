@@ -20,7 +20,6 @@ def stability(inMatrix: np.ndarray, numcolstoverify: int, tolerance: float) -> n
         else:
             outMatrix[row, col] = np.nan
 
-
     return outMatrix
 
 

@@ -4,7 +4,6 @@ from scipy.linalg import hankel, svd, pinv, eig
 import matplotlib.pyplot as plt
 
 
-
 def ESTER(W: np.ndarray, nbPolesMax: int) -> np.ndarray:
         
     J: np.ndarray = np.zeros(nbPolesMax)
@@ -39,7 +38,6 @@ def ESPRIT(signal: np.ndarray, nbPoles: int) -> tuple[np.ndarray, np.ndarray]:
     
     N: int = signal.shape[0]
     
-
     M: int = int(N/3)
     L: int = N - M + 1 # M vaut N /3 et l vaut horizon - M + 1
 
@@ -56,7 +54,6 @@ def ESPRIT(signal: np.ndarray, nbPoles: int) -> tuple[np.ndarray, np.ndarray]:
     Rk: np.ndarray = pinv(Wdown, check_finite=False) @ Wup
     Z: np.ndarray = eig(Rk, right=False)
     
-
     # Calcul du critère ESTER
     
     #DBGIMSHOW(C, W, np.abs(Z))
@@ -81,7 +78,6 @@ def parametres(signal: np.ndarray,
         tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]: _description_
     """    
 
-    
     poles, J = ESPRIT(signal, 2*nbPoles)
     
     # régler le pb de dimension de signal_Z dans np.linalg.eig()
@@ -103,7 +99,6 @@ def parametres(signal: np.ndarray,
     f = f[indexes]
     b = b[indexes]
     ksi = ksi[indexes]
-    
     
     #DBGPLOT(signal,f, b)
 
@@ -127,12 +122,14 @@ def vandermonde(z: np.ndarray, N: int) -> np.ndarray:
     
     return V
 
+
 def DBGPLOT(signal, f, b):
     fig, (ax1, ax2) = plt.subplots(2, 1)
     
     ax1.plot(f, 20*np.log10(b))
     ax2.plot(signal)
     return 
+    
     
 def DBGIMSHOW(mat1, mat2, poles):
     
