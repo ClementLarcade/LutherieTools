@@ -29,5 +29,5 @@ def affichage(
     plt.colorbar(graph)
     ax.grid(True)
     
-
+#Bonjour
     return
