@@ -56,7 +56,7 @@ def deNaNination(matrices: Matrices):
         if matrices.BdBSeuil[index] == -200: 
             matrices.F[index] = -1000
             
-        if matrices.Ksi[index] is np.NaN:            
+        if matrices.Ksi[index] is np.NaN or matrices.Ksi[index] == np.Inf :            
             matrices.Ksi[index] = 0
         
         matrices.Ksi[:, 0] = np.zeros_like(matrices.Ksi[:,0])

@@ -14,3 +14,4 @@ __pycache__/HROgramme.cpython-39.pyc
 __pycache__/Preset.cpython-39.pyc
 __pycache__/SignauxTest.cpython-39.pyc
 __pycache__/Stability.cpython-39.pyc
+*.pyc
