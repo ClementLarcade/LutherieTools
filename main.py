@@ -11,7 +11,6 @@ from Affichage import affichage
 from Stability import stability
 
 
-timeDebut = perf_counter()
 
 
 # Seuiller matKsik et matJk
@@ -51,6 +50,7 @@ print(f"overlap = {params.overlap}")
 print(f"nbPoles = {params.nbPoles}")
 
 #%% Calcul du HROgramme
+timeDebut = perf_counter()
 
 matrices = HROgramme(signal, params)
 
