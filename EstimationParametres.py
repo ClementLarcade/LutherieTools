@@ -84,7 +84,7 @@ def parametres(signal: np.ndarray,
     
     f: np.ndarray = np.angle(poles) * samplerate/(2*np.pi)
     b: np.ndarray = leastsquares(poles, signal)    
-    ksi: np.ndarray = -np.log(abs(poles))*samplerate
+    ksi: np.ndarray = (-np.log(abs(poles))*samplerate)/(2*np.pi*f)
     
     f = f[f > 0]
     b = np.abs(b[np.imag(b) > 0])  
